@@ -1,0 +1,8 @@
+name: Bankcraft
+main: de.hotmail.gurkilein.Bankcraft.Bankcraft
+version: 0.5
+depend: [Vault]
+commands:
+   bcreload:
+      description: This Command reloads the Bankcraftconfig
+      usage: /bcreload
