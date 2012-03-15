@@ -1,8 +1,17 @@
 name: Bankcraft
 main: de.hotmail.gurkilein.Bankcraft.Bankcraft
-version: 0.5
+version: 0.7a
 depend: [Vault]
 commands:
+   bank:
+      description: Main Bankcraft Command
+      usage: /bank
+   bankadmin:
+      description: Admin Bankcraft Command
+      usage: /bankadmin
    bcreload:
       description: This Command reloads the Bankcraftconfig
-      usage: /bcreload
+      usage: Use this from the console only!
+   bctimer:
+      description: This Command restarts the Interesttimer
+      usage: Use this from the console only"

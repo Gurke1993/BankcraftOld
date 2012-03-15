@@ -100,7 +100,7 @@ public class BankcraftBlockListener implements Listener {
     //You may want to add to lowercase function
     if(sign.getLine(0).contains("[Bank]")) {
     	if (!Bankcraft.perms.has(p, "bankcraft.admin")) {
-    		p.sendMessage(Bankcraft.disallow);
+    		p.sendMessage(configHandler.disallow);
     	    event.setCancelled(true);
     return;	
     	} else {
@@ -120,7 +120,7 @@ public class BankcraftBlockListener implements Listener {
     	            	delete(cordX,cordY,cordZ);
     	            	}
     	            }
- 	      		   p.sendMessage(Bankcraft.destroy);
+ 	      		   p.sendMessage(configHandler.destroy);
     	            }
     }
     }
@@ -151,10 +151,10 @@ public class BankcraftBlockListener implements Listener {
             	delete(cordX,cordY,cordZ);
             	}
             }
-   		   p.sendMessage(Bankcraft.destroy);
+   		   p.sendMessage(configHandler.destroy);
     } else {
     	event.setCancelled(true);
-  		   p.sendMessage(Bankcraft.disallow);
+  		   p.sendMessage(configHandler.disallow);
     }
     	}
     }
@@ -167,16 +167,16 @@ public class BankcraftBlockListener implements Listener {
         String ersteReihe = event.getLine(0);
     	if (ersteReihe.equalsIgnoreCase("[Bank]")) {
         	if (Bankcraft.perms.has(p, "bankcraft.admin")) {
-    		if ((((event.getLine(1).equals(Bankcraft.depositsign) | event.getLine(1).equals(Bankcraft.debitsign)| event.getLine(1).equals(Bankcraft.debitsignxp)| event.getLine(1).equals(Bankcraft.depositsignxp)) & (isInteger(event.getLine(2))) | event.getLine(2).equalsIgnoreCase("all")) | ((event.getLine(1).equals(Bankcraft.depositsignscroll)) | (event.getLine(1).equals(Bankcraft.debitsignscroll)) | (event.getLine(1).equals(Bankcraft.depositsignscrollxp)) | (event.getLine(1).equals(Bankcraft.debitsignscrollxp)))) == true) {
+    		if ((((event.getLine(1).equals(configHandler.depositsign) | event.getLine(1).equals(configHandler.debitsign)| event.getLine(1).equals(configHandler.debitsignxp)| event.getLine(1).equals(configHandler.depositsignxp)) & (isInteger(event.getLine(2))) | event.getLine(2).equalsIgnoreCase("all")) | ((event.getLine(1).equals(configHandler.depositsignscroll)) | (event.getLine(1).equals(configHandler.debitsignscroll)) | (event.getLine(1).equals(configHandler.depositsignscrollxp)) | (event.getLine(1).equals(configHandler.debitsignscrollxp)))) == true) {
     	        //ERSTELLEN DER BANK
-    	    	event.setLine(0,Bankcraft.bankcolor+"[Bank]");
+    	    	event.setLine(0,configHandler.bankcolor+"[Bank]");
      		   Integer betrag = 0;
      		       String typreihe = event.getLine(1);
         		   int signX = event.getBlock().getX();
         		   int signY = event.getBlock().getY();
         		   int signZ = event.getBlock().getZ();
         		   Integer typ = -1;
-        		   if (typreihe.equals(Bankcraft.depositsign)) {
+        		   if (typreihe.equals(configHandler.depositsign)) {
             		   if (event.getLine(2).equalsIgnoreCase("all")) {
             			   event.setLine(2, "All");
             			   betrag = -1;
@@ -185,7 +185,7 @@ public class BankcraftBlockListener implements Listener {
             		   }
         			   typ = 1;
         		   }
-        		   if (typreihe.equals(Bankcraft.debitsign)) {
+        		   if (typreihe.equals(configHandler.debitsign)) {
             		   if (event.getLine(2).equalsIgnoreCase("all")) {
             			   event.setLine(2, "All");
             			   betrag = -1;
@@ -194,15 +194,15 @@ public class BankcraftBlockListener implements Listener {
             		   }
         			   typ = 2;
         		   }
-        		   if (typreihe.equals(Bankcraft.depositsignscroll)) {
-        			   event.setLine(1, Bankcraft.depositsign);
+        		   if (typreihe.equals(configHandler.depositsignscroll)) {
+        			   event.setLine(1, configHandler.depositsign);
         			   typ = 3;
         		   }
-        		   if (typreihe.equals(Bankcraft.debitsignscroll)) {
-        			   event.setLine(1, Bankcraft.debitsign);
+        		   if (typreihe.equals(configHandler.debitsignscroll)) {
+        			   event.setLine(1, configHandler.debitsign);
         			   typ = 4;
         		   }
-        		   if (typreihe.equals(Bankcraft.depositsignxp)) {
+        		   if (typreihe.equals(configHandler.depositsignxp)) {
             		   if (event.getLine(2).equalsIgnoreCase("all")) {
             			   event.setLine(2, "All");
             			   betrag = -1;
@@ -211,7 +211,7 @@ public class BankcraftBlockListener implements Listener {
             		   }
         			   typ = 6;
         		   }
-        		   if (typreihe.equals(Bankcraft.debitsignxp)) {
+        		   if (typreihe.equals(configHandler.debitsignxp)) {
             		   if (event.getLine(2).equalsIgnoreCase("all")) {
             			   event.setLine(2, "All");
             			   betrag = -1;
@@ -220,32 +220,32 @@ public class BankcraftBlockListener implements Listener {
             		   }
         			   typ = 7;
         		   }
-        		   if (typreihe.equals(Bankcraft.depositsignscrollxp)) {
-        			   event.setLine(1, Bankcraft.depositsignxp);
+        		   if (typreihe.equals(configHandler.depositsignscrollxp)) {
+        			   event.setLine(1, configHandler.depositsignxp);
         			   typ = 8;
         		   }
-        		   if (typreihe.equals(Bankcraft.debitsignscrollxp)) {
-        			   event.setLine(1, Bankcraft.debitsignxp);
+        		   if (typreihe.equals(configHandler.debitsignscrollxp)) {
+        			   event.setLine(1, configHandler.debitsignxp);
         			   typ = 9;
         		   }
         		   
         		   speichern(signX,signY,signZ,typ,betrag);
-          		   p.sendMessage(Bankcraft.make);
+          		   p.sendMessage(configHandler.make);
     	
     	} else {
-    		if (event.getLine(1).equals(Bankcraft.balancesign) | (event.getLine(1).equals(Bankcraft.balancesignxp))) {
-    	    	event.setLine(0,Bankcraft.bankcolor+"[Bank]");
+    		if (event.getLine(1).equals(configHandler.balancesign) | (event.getLine(1).equals(configHandler.balancesignxp))) {
+    	    	event.setLine(0,configHandler.bankcolor+"[Bank]");
      		   int signX = event.getBlock().getX();
      		   int signY = event.getBlock().getY();
      		   int signZ = event.getBlock().getZ();
-     		   if (event.getLine(1).equals(Bankcraft.balancesignxp)) {
+     		   if (event.getLine(1).equals(configHandler.balancesignxp)) {
          		   speichern(signX,signY,signZ,5,0);   
      		   } else {
      		   speichern(signX,signY,signZ,0,0);
      		   }
-     		   p.sendMessage(Bankcraft.make);
+     		   p.sendMessage(configHandler.make);
     		} else {
-    	  		   p.sendMessage(Bankcraft.errorcreate);
+    	  		   p.sendMessage(configHandler.errorcreate);
     		event.setLine(0, "");
     		event.setLine(1, "");
     		event.setLine(2, "");
@@ -253,7 +253,7 @@ public class BankcraftBlockListener implements Listener {
     		}
     	}
     	} else {
-	  		   p.sendMessage(Bankcraft.disallow);
+	  		   p.sendMessage(configHandler.disallow);
     		event.setLine(0, "");
     		event.setLine(1, "");
     		event.setLine(2, "");
