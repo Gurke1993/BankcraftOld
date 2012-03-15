@@ -38,12 +38,12 @@ public class BankcraftPlayerListener implements Listener {
   		       if (Bankcraft.perms.has(p, "bankcraft.use")| (Bankcraft.perms.has(p, "bankcraft.use.money") && (typ ==0 | typ == 1 | typ == 2 | typ == 3 | typ == 4)) | (Bankcraft.perms.has(p, "bankcraft.use.exp") && (typ ==5 | typ == 6 | typ == 7 | typ == 8 | typ == 9))) {
     		if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 	    			if (((Sign)event.getClickedBlock().getState()).getLine(1).contains(configHandler.balancesign) | ((Sign)event.getClickedBlock().getState()).getLine(1).contains(configHandler.balancesignxp)) {
-	    				bankInteract.kontoneu(0,p,false);
+	    				bankInteract.kontoneu(0D,p,false);
 	    				File f;
 	    				String nachricht;
  	    				if (typ ==0) {
 	    					nachricht = configHandler.balance;
-	    					bankInteract.kontoneu(0,p,false);
+	    					bankInteract.kontoneu(0D,p,false);
  	 	    			    f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+p.getName()+".db");
  	 	    				} else {
  		    					nachricht = configHandler.balancexp;
@@ -71,7 +71,7 @@ public class BankcraftPlayerListener implements Listener {
  	    				String nachricht;
 	    				if (typ ==0) {
 	    					nachricht = configHandler.balance;
-	    					bankInteract.kontoneu(0,p,false);
+	    					bankInteract.kontoneu(0D,p,false);
  	    			    f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+p.getName()+".db");
  	    				} else {
 	    					nachricht = configHandler.balancexp;
@@ -87,21 +87,21 @@ public class BankcraftPlayerListener implements Listener {
 			   reader.close();
  	    			} else {
  	    				//transfer sign
- 	    				Integer betrag = 0;
+ 	    				Double betrag = 0.00;
  	       if (typ == 3 | typ == 4 | typ == 8 | typ == 9) {
  	       updateSign(event.getClickedBlock(),0);
-  		   betrag = (Integer)Bankcraft.betragArray[signPosition.get(event.getClickedBlock())];
+  		   betrag = (Double)Bankcraft.betragArray[signPosition.get(event.getClickedBlock())];
  	       } else {
  	   	   if (((Sign)event.getClickedBlock().getState()).getLine(2).equalsIgnoreCase("all")) {
  	   		   all=true;
- 	   		   betrag = 0;
+ 	   		   betrag = 0.00;
  	   	   } else {
- 	       betrag = new Integer(((Sign)event.getClickedBlock().getState()).getLine(2));
+ 	       betrag = new Double(((Sign)event.getClickedBlock().getState()).getLine(2));
  	   	   }
  	       }
   		   if (typ == 1 | typ == 3) {
   			   if (all == true) {
-  				   betrag = (int)Bankcraft.econ.getBalance(p.getName());
+  				   betrag = (Double)Bankcraft.econ.getBalance(p.getName());
   			   }
              EconomyResponse r1 = Bankcraft.econ.withdrawPlayer(p.getName(), betrag);
              if (r1.transactionSuccess()) {
@@ -113,11 +113,11 @@ public class BankcraftPlayerListener implements Listener {
   		   }
   		   if (typ == 6 | typ == 8) {
   			   if (all == true) {
-  				   betrag = Integer.valueOf((int)bankInteract.getTotalXp(p));
+  				   betrag = bankInteract.getTotalXp(p);
   			   }
-               if (Integer.valueOf((int)bankInteract.getTotalXp(p)) >= betrag) {
-            	   bankInteract.removeExp(p, betrag);
-            	   bankInteract.kontoneuxp(betrag,p,false);
+               if (bankInteract.getTotalXp(p) >= betrag) {
+            	   bankInteract.removeExp(p, betrag.intValue());
+            	   bankInteract.kontoneuxp(betrag.intValue(),p,false);
        	  		   p.sendMessage(configHandler.success1xp);
    			  } else {
    		  		   p.sendMessage(configHandler.lowmoney1xp);
@@ -125,7 +125,7 @@ public class BankcraftPlayerListener implements Listener {
     		   }
   		   
   		  if (typ == 2 | typ == 4) {
-  		  Integer differenz = bankInteract.kontoneu(-betrag,p,all);
+  			Double differenz = bankInteract.kontoneu(-betrag,p,all);
   			  if (differenz != -2) {
                    EconomyResponse r2 = Bankcraft.econ.depositPlayer(p.getName(), differenz);
                    if (r2.transactionSuccess()) {
@@ -136,7 +136,7 @@ public class BankcraftPlayerListener implements Listener {
   			  }
   		  }
   		  if (typ == 7 | typ == 9) {
-  	  		  Integer differenz = bankInteract.kontoneuxp(-betrag,p,all);
+  			Integer differenz = bankInteract.kontoneuxp(-betrag.intValue(),p,all);
   			  if (differenz != -2) {
                   p.giveExp(differenz);
        	  		   p.sendMessage(configHandler.success2xp);

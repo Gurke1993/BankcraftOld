@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.TimerTask;
 import org.bukkit.entity.Player;
 
@@ -25,19 +26,25 @@ public class ZinsenTimerTask extends TimerTask{
 		         FileReader fr = new FileReader(file);
 		            BufferedReader reader = new BufferedReader(fr);
 		            String st = reader.readLine(); 
-			            	Double betrag = new Integer(st)*(configHandler.interest+1);
+			            	Double betrag = new Double(st)*(configHandler.interest+1);
+			            	DecimalFormat df= new DecimalFormat("#0.00");   
+			            	String betragstring= df.format(betrag);  
+			            	betrag = Double.parseDouble(betragstring);  
 		   fr.close();
 		   reader.close();
         writer = new FileWriter(file);
-	       writer.write(betrag.intValue()+System.getProperty("line.separator"));
+	       writer.write(betrag+System.getProperty("line.separator"));
 	       writer.flush();
 	       writer.close();
 	       if (configHandler.broadcast == true) {
-	       Double zinsen = new Integer(st)*(configHandler.interest);
+	       Double zinsen = new Double(st)*(configHandler.interest);
+       	DecimalFormat dft= new DecimalFormat("#0.00");   
+       	String betragstringt= dft.format(zinsen);  
+       	zinsen = Double.parseDouble(betragstringt);  
 	       for (int j =0; j< playerArray.length; j++) {
 	    	   fB = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+playerArray[j].getName()+".db");
 	    	   if ( fB.isFile() == true && fB.equals(file)) {
-	    		   playerArray[j].sendMessage(configHandler.color+configHandler.prefix+zinsen.intValue()+" money granted! You now have "+betrag.intValue()+" on your Account!");
+	    		   playerArray[j].sendMessage((configHandler.interestmsg.replace("%interest", zinsen.toString())).replace("%balance", betrag.toString()));
 	    	   }
 	       }
 	       }
@@ -68,7 +75,7 @@ public class ZinsenTimerTask extends TimerTask{
 			       for (int j =0; j< playerArrayt.length; j++) {
 			    	   fB = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts"+System.getProperty("file.separator")+playerArray[j].getName()+".db");
 			    	   if ( fB.isFile() == true && fB.equals(filet)) {
-			    		   playerArrayt[j].sendMessage(configHandler.color+configHandler.prefix+zinsent.intValue()+" XP granted! You now have "+betragt.intValue()+" XP on your Account");
+			    		   playerArray[j].sendMessage((configHandler.interestxpmsg.replace("%interest", zinsent.toString())).replace("%balance", betragt.toString()));
 			    	   }
 			       }
 			       }

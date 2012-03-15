@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import org.bukkit.entity.Player;
 
@@ -61,10 +62,10 @@ public class bankInteract {
     return type;
     }
     
-	  public static Integer kontoneu(Integer betrag,Player p, Boolean all){
+	  public static double kontoneu(Double betrag,Player p, Boolean all){
 		  FileWriter writer;
 		  File file, file2;
-		  Integer enough =-2;
+		  Double enough =-2.00;
 		    // File anlegen
 		     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts");
              file2 = new File(file+System.getProperty("file.separator")+p.getName()+".db");
@@ -72,7 +73,7 @@ public class bankInteract {
 	                if (!file2.exists()) {
 	                    file.mkdirs();
 	                    writer = new FileWriter(file2, true);
-	                    writer.write("0");
+	                    writer.write("0.00");
 	     		        writer.write(System.getProperty("line.separator"));  
 	     		        writer.flush();
 	    		        writer.close();
@@ -80,19 +81,22 @@ public class bankInteract {
 			         FileReader fr = new FileReader(file2);
 			            BufferedReader reader = new BufferedReader(fr);
 			            String st = reader.readLine(); 
-			            	if ( new Integer(st) >= -betrag) {
+			            	if ( new Double(st) >= -betrag) {
 				            	enough = -betrag;
-				            	betrag += new Integer(st);
+				            	betrag += new Double(st);
 			            	} else {
-			            		betrag = new Integer(st);
-			            		enough = -2;
+			            		betrag = new Double(st);
+			            		enough = -2.00;
 			            	}
 			            	if (all==true) {
-			            		betrag = 0;
-			            		enough = new Integer(st);
+			            		betrag = 0.00;
+			            		enough = new Double(st);
 			            	}
 			   fr.close();
 			   reader.close();
+           	DecimalFormat df= new DecimalFormat("#0.00");   
+           	String betragstring= df.format(betrag);  
+           	betrag = Double.parseDouble(betragstring); 
                writer = new FileWriter(file2);
 		       writer.write(betrag+System.getProperty("line.separator"));
 		       writer.flush();

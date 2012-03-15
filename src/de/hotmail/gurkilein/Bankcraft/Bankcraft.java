@@ -48,6 +48,7 @@ public class Bankcraft extends JavaPlugin{
 		        this.configHandler.defaultConfig();
 		        this.configHandler.setConfig();
 		        this.bankInteract = new bankInteract(this);
+		        log.info(de.hotmail.gurkilein.Bankcraft.configHandler.success1);
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(this.playerListener, this);
 		pm.registerEvents(this.blockListener, this);
@@ -99,7 +100,6 @@ public class Bankcraft extends JavaPlugin{
     	if (cmd.getName().equalsIgnoreCase("bcreload")){ 
     		if (player == null) {
     	    	sender.sendMessage("Bankcraftconfig reloaded!");
-		        this.configHandler = new configHandler(this);
     			this.configHandler.defaultConfig();
     			this.configHandler.setConfig();
     		return true;

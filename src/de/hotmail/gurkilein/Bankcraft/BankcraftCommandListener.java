@@ -18,7 +18,7 @@ public class BankcraftCommandListener implements CommandExecutor {
 	
 @SuppressWarnings("unused")
 private Bankcraft plugin;
-public Integer betrag;
+public Double betrag;
 
 	public void sendHelp(Player p) {
 		p.sendMessage("---Bankcraft-Help---");
@@ -47,10 +47,10 @@ public Integer betrag;
 		plugin=b1;
 	}
 	
-	public boolean isInteger( String input )  {  
+	public boolean isDouble( String input )  {  
 		   try  
 		   {  
-		      Integer.parseInt( input );  
+		      Double.parseDouble( input );  
 		      return true;  
 		   }  
 		   catch (Exception e)
@@ -78,7 +78,7 @@ public Integer betrag;
 						return true;
 					}
 					if (vars[0].equalsIgnoreCase("balance") && (Bankcraft.perms.has(p, "bankcraft.command.balance") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-	    				bankInteract.kontoneu(0,p,false);
+	    				bankInteract.kontoneu(0D,p,false);
 	    				File f;
 	    				String nachricht;
 	    				nachricht = configHandler.balance;
@@ -118,10 +118,10 @@ public Integer betrag;
 				}
 				}
 				if (vars.length == 2) {
-					if (isInteger(vars[1])) {
+					if (isDouble(vars[1])) {
 						
 					if (vars[0].equalsIgnoreCase("deposit") && (Bankcraft.perms.has(p, "bankcraft.command.deposit") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-					  	betrag = new Integer(vars[1]); 
+					  	betrag = new Double(vars[1]); 
 				             EconomyResponse r1 = Bankcraft.econ.withdrawPlayer(p.getName(), betrag);
 				             if (r1.transactionSuccess()) {
 				            	 bankInteract.kontoneu(betrag,p,false);
@@ -134,8 +134,8 @@ public Integer betrag;
 						
 					
 					if (vars[0].equalsIgnoreCase("debit") && (Bankcraft.perms.has(p, "bankcraft.command.debit") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-					  	betrag = new Integer(vars[1]); 
-				  	  		  Integer differenz = bankInteract.kontoneu(-betrag,p,false);
+					  	betrag = new Double(vars[1]); 
+				  	  		  double differenz = bankInteract.kontoneu(-betrag,p,false);
 				  	  			  if (differenz != -2) {
 				  	                   EconomyResponse r2 = Bankcraft.econ.depositPlayer(p.getName(), differenz);
 				  	                   if (r2.transactionSuccess()) {
@@ -148,10 +148,10 @@ public Integer betrag;
 				  	  		  }
 					
 					if (vars[0].equalsIgnoreCase("depositxp") && (Bankcraft.perms.has(p, "bankcraft.command.depositxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-						betrag = new Integer(vars[1]);
+						betrag = new Double(vars[1]);
 			               if (Integer.valueOf((int)bankInteract.getTotalXp(p)) >= betrag) {
-			            	   bankInteract.removeExp(p, betrag);
-			            	   bankInteract.kontoneuxp(betrag,p,false);
+			            	   bankInteract.removeExp(p, betrag.intValue());
+			            	   bankInteract.kontoneuxp(betrag.intValue(),p,false);
 			       	  		   p.sendMessage(configHandler.success1xp);
 			   			  } else {
 			   		  		   p.sendMessage(configHandler.lowmoney1xp);
@@ -160,8 +160,8 @@ public Integer betrag;
 					}
 					if (vars[0].equalsIgnoreCase("debitxp") && (Bankcraft.perms.has(p, "bankcraft.command.debitxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
 						//HELP
-						betrag = new Integer(vars[1]);
-			  	  		  Integer differenz = bankInteract.kontoneuxp(-betrag,p,false);
+						betrag = new Double(vars[1]);
+			  	  		  Integer differenz = bankInteract.kontoneuxp(-betrag.intValue(),p,false);
 			  			  if (differenz != -2) {
 			                  p.giveExp(differenz);
 			       	  		   p.sendMessage(configHandler.success2xp);
@@ -174,7 +174,7 @@ public Integer betrag;
 			Player p2 =Bukkit.getPlayer(vars[1]);
 			if (p2!=null) {
 			if (vars[0].equalsIgnoreCase("balance") && (Bankcraft.perms.has(p, "bankcraft.command.balance.other") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-				bankInteract.kontoneu(0,p2,false);
+				bankInteract.kontoneu(0D,p2,false);
 				File f;
 				String nachricht;
 				nachricht = configHandler.balance;
@@ -216,12 +216,12 @@ public Integer betrag;
 		}	
 				}
 				if (vars.length == 3) {
-					if (isInteger(vars[2])) {
+					if (isDouble(vars[2])) {
 						Player p2 =Bukkit.getPlayer(vars[1]);
 						if (p2 != null) {
 					if (vars[0].equalsIgnoreCase("transfer") && (Bankcraft.perms.has(p, "bankcraft.command.transfer") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-					  	betrag = new Integer(vars[2]); 
-			  	  		  Integer differenz = bankInteract.kontoneu(-betrag,p,false);
+					  	betrag = new Double(vars[2]); 
+					  	Double differenz = bankInteract.kontoneu(-betrag,p,false);
 			  	  			  if (differenz != -2) {
 			  					
 					            	 bankInteract.kontoneu(betrag,p2,false);
@@ -235,9 +235,9 @@ public Integer betrag;
 					
 					
 					if (vars[0].equalsIgnoreCase("transferxp") && (Bankcraft.perms.has(p, "bankcraft.command.transferxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-			  	  		  Integer differenz = bankInteract.kontoneuxp(-betrag,p,false);
+						Integer differenz = bankInteract.kontoneuxp(-betrag.intValue(),p,false);
 			  			  if (differenz != -2) {
-				            	 bankInteract.kontoneuxp(betrag,p2,false);
+				            	 bankInteract.kontoneuxp(betrag.intValue(),p2,false);
 			       	  		   p.sendMessage(configHandler.success3xp);
 			               } else {
 			       	  		   p.sendMessage(configHandler.lowmoney2xp);
@@ -267,7 +267,7 @@ public Integer betrag;
 				if (p2!=null) {
 					if (vars.length==2) {
 						if (vars[0].equalsIgnoreCase("clear") && (Bankcraft.perms.has(p, "bankcraft.command.clear") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-						bankInteract.kontoneu(0, p2, true);
+						bankInteract.kontoneu(0D, p2, true);
 						p.sendMessage(configHandler.color+configHandler.prefix+"Account cleared!");
 						return true;
 						}
@@ -278,7 +278,7 @@ public Integer betrag;
 						}
 					}
 					if (vars.length==3) {
-						if (isInteger(vars[2])) {
+						if (isDouble(vars[2])) {
 							if (new Integer(vars[2])>=0) {
 							if (vars[0].equalsIgnoreCase("set") && (Bankcraft.perms.has(p, "bankcraft.command.set") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
 							     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts");
@@ -316,8 +316,8 @@ public Integer betrag;
 							}
 							
 							if (vars[0].equalsIgnoreCase("grant") && (Bankcraft.perms.has(p, "bankcraft.command.grant") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-							betrag = new Integer(vars[2]);
-							Integer differenz = bankInteract.kontoneu(betrag,p2,false);
+							betrag = new Double(vars[2]);
+							Double differenz = bankInteract.kontoneu(betrag,p2,false);
 				  			  if (differenz != -2) {
 				  				  p.sendMessage(configHandler.success1);
 				  			  } else {
@@ -328,8 +328,8 @@ public Integer betrag;
 							}
 							
 							if (vars[0].equalsIgnoreCase("grantxp") && (Bankcraft.perms.has(p, "bankcraft.command.grantxp") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-								betrag = new Integer(vars[2]);
-								Integer differenz = bankInteract.kontoneuxp(betrag,p2,false);
+								betrag = new Double(vars[2]);
+								Integer differenz = bankInteract.kontoneuxp(betrag.intValue(),p2,false);
 					  			  if (differenz != -2) {
 					  				  p.sendMessage(configHandler.success1xp);
 					  			  } else {

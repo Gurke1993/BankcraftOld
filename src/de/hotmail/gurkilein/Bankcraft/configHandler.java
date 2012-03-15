@@ -11,7 +11,7 @@ public class configHandler{
     public static ChatColor bankcolor,color;
     public static Integer timer;
     public static Boolean broadcast, broadcastxp, onlinemoney,onlinexp;
-    public static String prefix, make, destroy, depositsign, debitsign, depositsignscroll, debitsignscroll, balancesign, depositsignxp, debitsignxp, depositsignscrollxp, debitsignscrollxp, balancesignxp, disallow, errorcreate, lowmoney1, lowmoney2, lowmoney3, success1, success2, balance, lowmoney1xp, lowmoney2xp, lowmoney3xp, success3, success3xp, success1xp, success2xp, balancexp;
+    public static String prefix, make, destroy, depositsign, debitsign, depositsignscroll, debitsignscroll, balancesign, depositsignxp, debitsignxp, depositsignscrollxp, debitsignscrollxp, balancesignxp, disallow, errorcreate, lowmoney1, lowmoney2, lowmoney3, success1, success2, balance, lowmoney1xp, lowmoney2xp, lowmoney3xp, success3, success3xp, success1xp, success2xp, balancexp, interestmsg, interestxpmsg;
 	private static final ChatColor[] colors =  new ChatColor[]{ChatColor.AQUA, ChatColor.BLACK, ChatColor.BLUE, ChatColor.DARK_AQUA, ChatColor.DARK_BLUE, ChatColor.DARK_GRAY, ChatColor.DARK_GREEN, ChatColor.DARK_PURPLE, ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.GRAY, ChatColor.GREEN, ChatColor.LIGHT_PURPLE, ChatColor.RED, ChatColor.WHITE, ChatColor.YELLOW};
 	 
 	private Bankcraft plugin;
@@ -59,6 +59,8 @@ public class configHandler{
 		success2xp = (color+prefix+this.plugin.getConfig().getString("language.success2xp"));
 		success3xp = (color+prefix+this.plugin.getConfig().getString("language.success3xp"));
 		balancexp = (color+prefix+this.plugin.getConfig().getString("language.balancexp"));
+		interestmsg = (color+prefix+this.plugin.getConfig().getString("language.interestmsg"));
+		interestxpmsg = (color+prefix+this.plugin.getConfig().getString("language.interestxpmsg"));
 		return true;
 	}
 	public boolean defaultConfig() {
@@ -181,6 +183,12 @@ public class configHandler{
 				}
 			if(!config.contains("language.balancexp")) {
 				config.set("language.balancexp", "Banked experience: %balance XP");
+			}
+			if(!config.contains("language.interestmsg")) {
+				config.set("language.interestmsg", "%interest money granted! You know have %balance!");
+			}
+			if(!config.contains("language.interestxpmsg")) {
+				config.set("language.interestxpmsg", "%interest XP granted! You know have %balance!");
 			}
 			this.plugin.saveConfig();
 			this.plugin.reloadConfig();
