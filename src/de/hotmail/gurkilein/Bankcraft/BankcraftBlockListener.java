@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -21,7 +22,7 @@ public class BankcraftBlockListener implements Listener {
 	  FileWriter writer;
 	  File file, file2;
 	  
-	  public void speichern(int x, int y, int z, int typ, double betrag ){
+	  public void speichern(int x, int y, int z, int typ, World w, String betrag ){
 		    // File anlegen
 		     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft");
 		     try {
@@ -31,7 +32,7 @@ public class BankcraftBlockListener implements Listener {
 		       writer = new FileWriter(file2 ,true);
 		       
 		       // Text wird in den Stream geschrieben
-		       writer.write(x+":"+y+":"+z+":"+typ+":"+betrag);
+		       writer.write(x+":"+y+":"+z+":"+w.getName()+":"+typ+":"+betrag);
 		       writer.write(System.getProperty("line.separator"));     
 		       writer.flush();
 		       
@@ -41,7 +42,7 @@ public class BankcraftBlockListener implements Listener {
 		      e.printStackTrace();
 		    }
 	  }
-	  public void delete(int x, int y, int z){
+	  public void delete(int x, int y, int z, World w){
 		    // File anlegen
 		     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"banks.db");
 		     try {
@@ -53,7 +54,8 @@ public class BankcraftBlockListener implements Listener {
 		           	 Integer cordX = new Integer(st.split(":")[0]);
 		           	 Integer cordY = new Integer(st.split(":")[1]);
 		           	 Integer cordZ = new Integer(st.split(":")[2]);
-		            	if (!(cordX == x & cordY == y & cordZ == z)) {
+		           	 World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
+		            	if (!(cordX == x & cordY == y & cordZ == z && cordW.equals(w))) {
 		            		stringneu += st+System.getProperty("line.separator");
 		            	}
 		            }
@@ -105,10 +107,9 @@ public class BankcraftBlockListener implements Listener {
     return;	
     	} else {
     	    File f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"banks.db");
-    	    if (!f.exists()) {
-    	            speichern(0,0,0,0,0);
-    	            delete(0,0,0);
-    	    }
+    	  
+    	    f.createNewFile();
+    	    
     	            FileReader fr = new FileReader(f);
     	            BufferedReader reader = new BufferedReader(fr);
     	            String st = "";
@@ -116,8 +117,9 @@ public class BankcraftBlockListener implements Listener {
     	           	 Integer cordX = new Integer(st.split(":")[0]);
     	           	 Integer cordY = new Integer(st.split(":")[1]);
     	           	 Integer cordZ = new Integer(st.split(":")[2]);
-    	            	if (cordX == nachbarblock.getX() & cordY == nachbarblock.getY() & cordZ == nachbarblock.getZ()) {
-    	            	delete(cordX,cordY,cordZ);
+    	           	 World cordw = Bankcraft.server.getWorld(st.split(":")[3]);
+    	            	if (cordX == nachbarblock.getX() & cordY == nachbarblock.getY() & cordZ == nachbarblock.getZ() & cordw.equals(nachbarblock.getWorld())) {
+    	            	delete(cordX,cordY,cordZ,cordw);
     	            	}
     	            }
  	      		   p.sendMessage(configHandler.destroy);
@@ -136,10 +138,9 @@ public class BankcraftBlockListener implements Listener {
 	            }
     	if (Bankcraft.perms.has(p, "bankcraft.admin")) {
     File f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"banks.db");
-    if (!f.exists()) {
-        speichern(0,0,0,0,0);
-        delete(0,0,0);
-    }
+
+    f.createNewFile();
+    
             FileReader fr = new FileReader(f);
             BufferedReader reader = new BufferedReader(fr);
             String st = "";
@@ -147,8 +148,9 @@ public class BankcraftBlockListener implements Listener {
            	 Integer cordX = new Integer(st.split(":")[0]);
            	 Integer cordY = new Integer(st.split(":")[1]);
            	 Integer cordZ = new Integer(st.split(":")[2]);
-            	if (cordX == event.getBlock().getX() & cordY == event.getBlock().getY() & cordZ == event.getBlock().getZ()) {
-            	delete(cordX,cordY,cordZ);
+           	 World cordw = Bankcraft.server.getWorld(st.split(":")[3]);
+            	if (cordX == event.getBlock().getX() & cordY == event.getBlock().getY() & cordZ == event.getBlock().getZ() & event.getBlock().getWorld().equals(cordw)) {
+            	delete(cordX,cordY,cordZ,cordw);
             	}
             }
    		   p.sendMessage(configHandler.destroy);
@@ -167,7 +169,7 @@ public class BankcraftBlockListener implements Listener {
         String ersteReihe = event.getLine(0);
     	if (ersteReihe.equalsIgnoreCase("[Bank]")) {
         	if (Bankcraft.perms.has(p, "bankcraft.admin")) {
-    		if ((((event.getLine(1).equals(configHandler.depositsign) | event.getLine(1).equals(configHandler.debitsign)| event.getLine(1).equals(configHandler.debitsignxp)| event.getLine(1).equals(configHandler.depositsignxp)) & (isDouble(event.getLine(2))) | event.getLine(2).equalsIgnoreCase("all")) | ((event.getLine(1).equals(configHandler.depositsignscroll)) | (event.getLine(1).equals(configHandler.debitsignscroll)) | (event.getLine(1).equals(configHandler.depositsignscrollxp)) | (event.getLine(1).equals(configHandler.debitsignscrollxp)))) == true) {
+    		if (((event.getLine(1).equals(configHandler.depositsign) | event.getLine(1).equals(configHandler.debitsign)| event.getLine(1).equals(configHandler.debitsignxp)| event.getLine(1).equals(configHandler.depositsignxp)) & (isDouble(event.getLine(2))) | event.getLine(2).equalsIgnoreCase("all")) == true) {
     	        //ERSTELLEN DER BANK
     	    	event.setLine(0,configHandler.bankcolor+"[Bank]");
      		   double betrag = 0;
@@ -194,14 +196,7 @@ public class BankcraftBlockListener implements Listener {
             		   }
         			   typ = 2;
         		   }
-        		   if (typreihe.equals(configHandler.depositsignscroll)) {
-        			   event.setLine(1, configHandler.depositsign);
-        			   typ = 3;
-        		   }
-        		   if (typreihe.equals(configHandler.debitsignscroll)) {
-        			   event.setLine(1, configHandler.debitsign);
-        			   typ = 4;
-        		   }
+
         		   if (typreihe.equals(configHandler.depositsignxp)) {
             		   if (event.getLine(2).equalsIgnoreCase("all")) {
             			   event.setLine(2, "All");
@@ -220,16 +215,7 @@ public class BankcraftBlockListener implements Listener {
             		   }
         			   typ = 7;
         		   }
-        		   if (typreihe.equals(configHandler.depositsignscrollxp)) {
-        			   event.setLine(1, configHandler.depositsignxp);
-        			   typ = 8;
-        		   }
-        		   if (typreihe.equals(configHandler.debitsignscrollxp)) {
-        			   event.setLine(1, configHandler.debitsignxp);
-        			   typ = 9;
-        		   }
-        		   
-        		   speichern(signX,signY,signZ,typ,betrag);
+        		   speichern(signX,signY,signZ,typ,event.getBlock().getWorld(),betrag+"");
           		   p.sendMessage(configHandler.make);
     	
     	} else {
@@ -239,9 +225,9 @@ public class BankcraftBlockListener implements Listener {
      		   int signY = event.getBlock().getY();
      		   int signZ = event.getBlock().getZ();
      		   if (event.getLine(1).equals(configHandler.balancesignxp)) {
-         		   speichern(signX,signY,signZ,5,0);   
+         		   speichern(signX,signY,signZ,5,event.getBlock().getWorld(),"0");   
      		   } else {
-     		   speichern(signX,signY,signZ,0,0);
+     		   speichern(signX,signY,signZ,0,event.getBlock().getWorld(),"0");
      		   }
      		   p.sendMessage(configHandler.make);
     		} else {

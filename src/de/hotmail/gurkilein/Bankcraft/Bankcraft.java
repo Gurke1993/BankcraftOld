@@ -1,8 +1,6 @@
 package de.hotmail.gurkilein.Bankcraft;
 
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 import net.milkbowl.vault.Vault;
 import net.milkbowl.vault.economy.Economy;
@@ -28,8 +26,6 @@ public class Bankcraft extends JavaPlugin{
 	public configHandler configHandler;
 	public static Logger log = Logger.getLogger("Minecraft");
 	private static int taskId = -1;
-	public static  Object[] betragArray;
-
 	public void onEnable(){
 		Server serverl = this.getServer();
 		server = serverl;
@@ -48,20 +44,12 @@ public class Bankcraft extends JavaPlugin{
 		        this.configHandler.defaultConfig();
 		        this.configHandler.setConfig();
 		        this.bankInteract = new bankInteract(this);
-		        log.info(de.hotmail.gurkilein.Bankcraft.configHandler.success1);
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(this.playerListener, this);
 		pm.registerEvents(this.blockListener, this);
 		BankcraftCommandListener bcl= new BankcraftCommandListener(this);
 		getCommand("bank").setExecutor(bcl);
 		getCommand("bankadmin").setExecutor(bcl);
-		//BETRAGARRAY
-		List<Integer> betragArrayload=new ArrayList<Integer>();
-		for (int i= 0; i <= 9; i++) {
-			betragArrayload.add((int)Math.pow(10, i));
-		}
-		betragArray = betragArrayload.toArray();
-		
 	    toggleTimerTask();
 		log.info("Bankcraft has been enabled!");
 	}

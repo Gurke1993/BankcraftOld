@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 public class bankInteract {
@@ -44,7 +45,7 @@ public class bankInteract {
         return Exp1;
       }
 	
-    public static Integer getTypeBank(Integer cordX1, Integer cordY1, Integer cordZ1) throws Exception{
+    public static Integer getTypeBank(Integer cordX1, Integer cordY1, Integer cordZ1, World cordW1) throws Exception{
     	Integer type=-1;
         File f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"banks.db");
         f.createNewFile();
@@ -55,8 +56,9 @@ public class bankInteract {
        	 Integer cordX = new Integer(st.split(":")[0]);
        	 Integer cordY = new Integer(st.split(":")[1]);
        	 Integer cordZ = new Integer(st.split(":")[2]);
-        	if ((cordX.equals(cordX1)) & (cordY.equals(cordY1)) & (cordZ.equals(cordZ1))) {
-        	type = new Integer(st.split(":")[3]);
+       	 World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
+        	if ((cordX.equals(cordX1)) & (cordY.equals(cordY1)) & (cordZ.equals(cordZ1))& (cordW.equals(cordW1))) {
+        	type = new Integer(st.split(":")[4]);
     }
         }
     return type;

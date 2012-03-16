@@ -1,6 +1,6 @@
 name: Bankcraft
 main: de.hotmail.gurkilein.Bankcraft.Bankcraft
-version: 0.8
+version: 1.0a
 depend: [Vault]
 commands:
    bank:
@@ -15,3 +15,11 @@ commands:
    bctimer:
       description: This Command restarts the Interesttimer
       usage: Use this from the console only"
+permissions:
+   bankcraft.use:
+      description: Allows the use of the Bankcraftbanks
+      default: true
+   bankcraft.admin:
+      description: Allows creating and removing Bankcraftbanks
+      default: op
+      

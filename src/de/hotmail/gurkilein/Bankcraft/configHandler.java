@@ -1,6 +1,11 @@
 package de.hotmail.gurkilein.Bankcraft;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,9 +16,9 @@ public class configHandler{
     public static ChatColor bankcolor,color;
     public static Integer timer;
     public static Boolean broadcast, broadcastxp, onlinemoney,onlinexp;
-    public static String prefix, make, destroy, depositsign, debitsign, depositsignscroll, debitsignscroll, balancesign, depositsignxp, debitsignxp, depositsignscrollxp, debitsignscrollxp, balancesignxp, disallow, errorcreate, lowmoney1, lowmoney2, lowmoney3, success1, success2, balance, lowmoney1xp, lowmoney2xp, lowmoney3xp, success3, success3xp, success1xp, success2xp, balancexp, interestmsg, interestxpmsg;
+    public static String amountadded, prefix, make, destroy, depositsign, debitsign, balancesign, depositsignxp, debitsignxp, balancesignxp, disallow, errorcreate, lowmoney1, lowmoney2, lowmoney3, success1, success2, balance, lowmoney1xp, lowmoney2xp, lowmoney3xp, success3, success3xp, success1xp, success2xp, balancexp, interestmsg, interestxpmsg;
 	private static final ChatColor[] colors =  new ChatColor[]{ChatColor.AQUA, ChatColor.BLACK, ChatColor.BLUE, ChatColor.DARK_AQUA, ChatColor.DARK_BLUE, ChatColor.DARK_GRAY, ChatColor.DARK_GREEN, ChatColor.DARK_PURPLE, ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.GRAY, ChatColor.GREEN, ChatColor.LIGHT_PURPLE, ChatColor.RED, ChatColor.WHITE, ChatColor.YELLOW};
-	 
+	public static String [][] interestGroups;
 	private Bankcraft plugin;
 	public configHandler(Bankcraft b1) {
 		this.plugin= b1;
@@ -21,6 +26,34 @@ public class configHandler{
 	
 
 	public boolean setConfig() {
+		
+	     try {
+		        File interestdb = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"interests.db");
+		        interestdb.createNewFile();
+             
+		         FileReader fr = new FileReader(interestdb);
+		            BufferedReader reader = new BufferedReader(fr);
+		            String st;
+		    		List<String> interestGroupsLoad1 =new ArrayList<String>();
+		    		List<String> interestGroupsLoad2 =new ArrayList<String>();
+		    		List<String> interestGroupsLoad3 =new ArrayList<String>();
+		            while ((st = reader.readLine()) != null) {
+		            	interestGroupsLoad1.add(st.split("=")[0]);
+		            	interestGroupsLoad2.add(st.split("=")[1]);
+		            	interestGroupsLoad3.add(st.split("=")[2]);
+		            }
+		            interestGroups = new String [3][interestGroupsLoad2.size()];
+		            for (int i=0; i<interestGroups[1].length;i++) {
+		            	interestGroups[0][i] = interestGroupsLoad1.get(i);
+		            	interestGroups[1][i] = interestGroupsLoad2.get(i);
+		            	interestGroups[2][i] = interestGroupsLoad3.get(i);
+		            }
+		   fr.close();
+		   reader.close();
+	    } catch (IOException e) {
+	      e.printStackTrace();
+	    }
+		
     	color= colors[this.plugin.getConfig().getInt("language.color")];
     	bankcolor = colors[this.plugin.getConfig().getInt("language.signcolor")];
     	prefix = this.plugin.getConfig().getString("language.prefix")+" ";
@@ -33,13 +66,9 @@ public class configHandler{
 	    timer = this.plugin.getConfig().getInt("general.timer");
 		depositsign = this.plugin.getConfig().getString("language.depositsign");
 		debitsign = this.plugin.getConfig().getString("language.debitsign");
-		depositsignscroll = this.plugin.getConfig().getString("language.depositsignscroll");
-		debitsignscroll = this.plugin.getConfig().getString("language.debitsignscroll");
 		balancesign = this.plugin.getConfig().getString("language.balancesign");
 		depositsignxp = this.plugin.getConfig().getString("language.depositsignxp");
 		debitsignxp = this.plugin.getConfig().getString("language.debitsignxp");
-		depositsignscrollxp = this.plugin.getConfig().getString("language.depositsignscrollxp");
-		debitsignscrollxp = this.plugin.getConfig().getString("language.debitsignscrollxp");
 		balancesignxp = this.plugin.getConfig().getString("language.balancesignxp");
 		make = (color+prefix+this.plugin.getConfig().getString("language.make"));
 		destroy = (color+prefix+this.plugin.getConfig().getString("language.destroy"));
@@ -61,6 +90,7 @@ public class configHandler{
 		balancexp = (color+prefix+this.plugin.getConfig().getString("language.balancexp"));
 		interestmsg = (color+prefix+this.plugin.getConfig().getString("language.interestmsg"));
 		interestxpmsg = (color+prefix+this.plugin.getConfig().getString("language.interestxpmsg"));
+		amountadded = (color+prefix+this.plugin.getConfig().getString("language.amountadded"));
 		return true;
 	}
 	public boolean defaultConfig() {
@@ -109,12 +139,6 @@ public class configHandler{
 			if(!config.contains("language.debitsign")) {
 				config.set("language.debitsign", "Debit");
 			}
-			if(!config.contains("language.depositsignscroll")) {
-				config.set("language.depositsignscroll", "DepositS");
-			}
-			if(!config.contains("language.debitsignscroll")) {
-				config.set("language.debitsignscroll", "DebitS");	
-			}
 			if(!config.contains("language.balancesignxp")) {
 				config.set("language.balancesignxp", "XPBalance");
 			}
@@ -123,12 +147,6 @@ public class configHandler{
 			}
 			if(!config.contains("language.debitsignxp")) {
 				config.set("language.debitsignxp", "XPDebit");
-			}
-			if(!config.contains("language.depositsignscrollxp")) {
-				config.set("language.depositsignscrollxp", "XPDepositS");
-			}
-			if(!config.contains("language.debitsignscrollxp")) {
-				config.set("language.debitsignscrollxp", "XPDebitS");
 			}
 			if(!config.contains("language.make")) {
 				config.set("language.make", "Bank created!");
@@ -189,6 +207,9 @@ public class configHandler{
 			}
 			if(!config.contains("language.interestxpmsg")) {
 				config.set("language.interestxpmsg", "%interest XP granted! You know have %balance!");
+			}
+			if(!config.contains("language.amountadded")) {
+				config.set("language.amountadded", "Your value was successfully added to the sign!");
 			}
 			this.plugin.saveConfig();
 			this.plugin.reloadConfig();

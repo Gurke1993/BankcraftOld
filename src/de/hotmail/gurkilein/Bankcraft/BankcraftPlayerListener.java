@@ -3,10 +3,14 @@ package de.hotmail.gurkilein.Bankcraft;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -29,7 +33,7 @@ public class BankcraftPlayerListener implements Listener {
     	if (block == "WALL_SIGN" ) {
     		if (((Sign)event.getClickedBlock().getState()).getLine(0).contains("[Bank]")) {
     			if (!p.isSneaking()) {
-  				Integer typ = bankInteract.getTypeBank(event.getClickedBlock().getX(),event.getClickedBlock().getY(),event.getClickedBlock().getZ());
+  				Integer typ = bankInteract.getTypeBank(event.getClickedBlock().getX(),event.getClickedBlock().getY(),event.getClickedBlock().getZ(),event.getClickedBlock().getWorld());
   				if (typ==-1) {
   					p.sendMessage(configHandler.color+configHandler.prefix+"Sign not in Database! Removing Sign!");
   					event.getClickedBlock().setType(Material.AIR);
@@ -90,7 +94,7 @@ public class BankcraftPlayerListener implements Listener {
  	    				Double betrag = 0.00;
  	       if (typ == 3 | typ == 4 | typ == 8 | typ == 9) {
  	       updateSign(event.getClickedBlock(),0);
-  		   betrag = (Double)Bankcraft.betragArray[signPosition.get(event.getClickedBlock())];
+  		   betrag = updateSign(event.getClickedBlock(),0);
  	       } else {
  	   	   if (((Sign)event.getClickedBlock().getState()).getLine(2).equalsIgnoreCase("all")) {
  	   		   all=true;
@@ -155,28 +159,74 @@ public class BankcraftPlayerListener implements Listener {
     	}
     }
     }
-    public Integer updateSign(Block block,int steps){
+    
+    
+    public Object[] getScrollingArray(Block block) {
+    	String liststring=null;
+	     File file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"banks.db");
+	     try {
+	    	 Integer x,y,z;
+	    	 x=block.getX();
+	    	 y=block.getY();
+	    	 z=block.getZ();
+	    	 World w= block.getWorld();
+	         FileReader fr = new FileReader(file);
+	            BufferedReader reader = new BufferedReader(fr);
+	            String st = "";
+	            while ((st = reader.readLine()) != null) {
+	           	 Integer cordX = new Integer(st.split(":")[0]);
+	           	 Integer cordY = new Integer(st.split(":")[1]);
+	           	 Integer cordZ = new Integer(st.split(":")[2]);
+	           	 World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
+	            	if (cordX.equals(x) && cordY.equals(y) && cordZ.equals(z) && cordW.equals(w)) {
+	            		liststring= st.split(":")[5];
+	            	}
+	            }
+			       fr.close();
+			       reader.close();
+	    } catch (IOException e) {
+	      e.printStackTrace();
+	    }
+    	
+		List<Double> loadArray=new ArrayList<Double>();
+		for (int i=0;i<liststring.split(",").length;i++) {
+			loadArray.add(new Double(liststring.split(",")[i]));
+			
+		}
+      
+		return loadArray.toArray();
+    	
+    	
+    }
+    
+    
+    
+    public double updateSign(Block block,int steps){
+
+    	Object[] scrollingSignArray = getScrollingArray(block);
+
+    	Sign sign = (Sign)block.getState();
     	 
         if(signPosition.containsKey(block)){
-            if(signPosition.get(block)<9){
+            if(signPosition.get(block)<(scrollingSignArray.length-steps)){
             	signPosition.put(block, signPosition.get(block)+steps);
-            	((Sign)block.getState()).setLine(2, "> "+Bankcraft.betragArray[signPosition.get(block)]+"");
-            	if (signPosition.get(block) == 9) {
-            		((Sign)block.getState()).setLine(3, Bankcraft.betragArray[0]+"");
+            	sign.setLine(2, "> "+scrollingSignArray[signPosition.get(block)]+"");
+            	if (signPosition.get(block).equals(scrollingSignArray.length-1)) {
+            		sign.setLine(3, scrollingSignArray[0]+"");
             	} else {
-            		((Sign)block.getState()).setLine(3, (Bankcraft.betragArray[signPosition.get(block)+1])+"");
+            		sign.setLine(3, (scrollingSignArray[signPosition.get(block)+1])+"");
             	}
             } else {
             	signPosition.put(block, 0);
-            	((Sign)block.getState()).setLine(2, "> "+Bankcraft.betragArray[0]+"");
-            	((Sign)block.getState()).setLine(3, Bankcraft.betragArray[1]+"");
+            	sign.setLine(2, "> "+scrollingSignArray[0]+"");
+            	sign.setLine(3, scrollingSignArray[1]+"");
             }
         } else {
         	signPosition.put(block, 0);
-        	((Sign)block.getState()).setLine(2, "> "+Bankcraft.betragArray[0]+"");
-        	((Sign)block.getState()).setLine(3, Bankcraft.betragArray[1]+"");
+        	sign.setLine(2, "> "+scrollingSignArray[0]+"");
+        	sign.setLine(3, scrollingSignArray[1]+"");
         }
-    ((Sign)block.getState()).update();
-    return signPosition.get(block);
+    sign.update(true);
+    return (Double)scrollingSignArray[signPosition.get(block)];
     }
 }
