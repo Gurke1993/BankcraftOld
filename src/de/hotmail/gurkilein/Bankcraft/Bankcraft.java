@@ -23,7 +23,7 @@ public class Bankcraft extends JavaPlugin{
     public final BankcraftPlayerListener playerListener = new BankcraftPlayerListener();
 	public final BankcraftBlockListener blockListener = new BankcraftBlockListener();
 	public bankInteract bankInteract;
-	public configHandler configHandler;
+	public configHandler configHandlerObj;
 	public static Logger log = Logger.getLogger("Minecraft");
 	private static int taskId = -1;
 	public void onEnable(){
@@ -34,15 +34,15 @@ public class Bankcraft extends JavaPlugin{
         if(x != null & x instanceof Vault) {
             vault = (Vault) x; }
 		        if (!setupEconomy() ) {
-		            log.info("Vault needed");
+		            log.info("[Bankcraft] Vault needed");
 		            getServer().getPluginManager().disablePlugin(this);
 		            return;
 		        }
 		        setupPermissions();
 		//Settings
-		        this.configHandler = new configHandler(this);
-		        this.configHandler.defaultConfig();
-		        this.configHandler.setConfig();
+		        this.configHandlerObj = new configHandler(this);
+		        this.configHandlerObj.defaultConfig();
+		        this.configHandlerObj.setConfig();
 		        this.bankInteract = new bankInteract(this);
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(this.playerListener, this);
@@ -51,11 +51,11 @@ public class Bankcraft extends JavaPlugin{
 		getCommand("bank").setExecutor(bcl);
 		getCommand("bankadmin").setExecutor(bcl);
 	    toggleTimerTask();
-		log.info("Bankcraft has been enabled!");
+		log.info("[Bankcraft] Bankcraft has been enabled!");
 	}
  
 	public void onDisable(){
-		log.info("Bankcraft has been disabled.");
+		log.info("[Bankcraft] Bankcraft has been disabled.");
 	}
     private boolean setupPermissions() {
         RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
@@ -72,8 +72,9 @@ public class Bankcraft extends JavaPlugin{
     }
     public void toggleTimerTask() {
 		Integer timer = getConfig().getInt("general.timer");
-        if (taskId != -1)
+        if (taskId != -1) {
           getServer().getScheduler().cancelTask(taskId);
+        taskId = -1; }
         else
           taskId = getServer().getScheduler().scheduleAsyncRepeatingTask(
             this, new ZinsenTimerTask(), 1200*timer, 
@@ -87,15 +88,15 @@ public class Bankcraft extends JavaPlugin{
     	}
     	if (cmd.getName().equalsIgnoreCase("bcreload")){ 
     		if (player == null) {
-    	    	sender.sendMessage("Bankcraftconfig reloaded!");
-    			this.configHandler.defaultConfig();
-    			this.configHandler.setConfig();
+    	    	sender.sendMessage("[Bankcraft] Bankcraftconfig reloaded!");
+    			this.configHandlerObj.defaultConfig();
+    			this.configHandlerObj.setConfig();
     		return true;
     	}
     }
     	if (cmd.getName().equalsIgnoreCase("bctimer")){ 
     		if (player == null) {
-    	    	sender.sendMessage("Bankcrafttimer restarted!");
+    	    	sender.sendMessage("[Bankcraft] Bankcrafttimer restarted!");
                 toggleTimerTask();
                 toggleTimerTask();
     		return true;

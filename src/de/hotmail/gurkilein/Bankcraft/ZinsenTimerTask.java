@@ -15,7 +15,7 @@ public class ZinsenTimerTask extends TimerTask{
 	  try {
 		  Player p;
 		//  GELDzinsen
-		  double interest = configHandler.interest;
+		  double interest = 0D;
 		  File fB;
 		  File fA = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts");
 	       Player[] playerArray = Bankcraft.server.getOnlinePlayers();
@@ -27,11 +27,21 @@ public class ZinsenTimerTask extends TimerTask{
 		         FileReader fr = new FileReader(file);
 		            BufferedReader reader = new BufferedReader(fr);
 		            String st = reader.readLine(); 
+		            if (new Double(st)>=0) {
+		            	interest = configHandler.interest;
+		            } else {
+		            	interest = configHandler.loaninterest;
+		            }
 		            p = Bankcraft.server.getPlayer(fileArray[i].getName().toString().split(".db")[0]);
 		            if (p!=null) {
 		            for (int k=0; k<configHandler.interestGroups[0].length;k++) {
 		            if (Bankcraft.perms.playerHas(p, "bankcraft.interest."+configHandler.interestGroups[0][k])) {
+		            	if (new Double(st)>=0) {
 		            	interest = new Double(configHandler.interestGroups[1][k]);
+		            	} else {
+		            		p.damage(configHandler.loandamage);
+		            		interest = new Double(configHandler.interestGroups[3][k]);
+		            	}
 		            }
 		            }
 		            }
@@ -42,7 +52,11 @@ public class ZinsenTimerTask extends TimerTask{
 		   fr.close();
 		   reader.close();
         writer = new FileWriter(file);
+        if (betrag <= configHandler.limit || configHandler.limit == -1) {
 	       writer.write(betrag+System.getProperty("line.separator"));
+        } else {
+        	writer.write(st);
+        }
 	       writer.flush();
 	       writer.close();
 	       if (configHandler.broadcast == true) {
@@ -53,7 +67,11 @@ public class ZinsenTimerTask extends TimerTask{
 	       for (int j =0; j< playerArray.length; j++) {
 	    	   fB = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+playerArray[j].getName()+".db");
 	    	   if ( fB.isFile() == true && fB.equals(file)) {
-	    		   playerArray[j].sendMessage((configHandler.interestmsg.replace("%interest", zinsen.toString())).replace("%balance", betrag.toString()));
+	    		   if (betrag <= configHandler.limit || configHandler.limit == -1) {
+     	  		   playerArray[j].sendMessage(configHandler.getMessage(configHandler.interestmsg, p.getName(), zinsen));
+	    		   } else {
+	    			   playerArray[j].sendMessage(configHandler.getMessage(configHandler.interestlimitmsg, p.getName(), zinsen));
+	    		   }
 	    	   }
 	       }
 	       }
@@ -62,7 +80,7 @@ public class ZinsenTimerTask extends TimerTask{
 		  }
 	       
 	       //EXPZinsen
-		  double interestxp= configHandler.interestxp;
+		  double interestxp= 0D;
 			  File fAt = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts");
 		       Player[] playerArrayt = Bankcraft.server.getOnlinePlayers();
 			  File[] fileArrays = fAt.listFiles();
@@ -73,10 +91,22 @@ public class ZinsenTimerTask extends TimerTask{
 			         FileReader frt = new FileReader(filet);
 			            BufferedReader readert = new BufferedReader(frt);
 			            String stt = readert.readLine(); 
+			            if (new Double(stt)>=0) {
+			            	interest = configHandler.interestxp;
+			            } else {
+			            	interest = configHandler.loaninterestxp;
+			            }
 			            p = Bankcraft.server.getPlayer(fileArrays[it].getName().toString().split(".db")[0]);
+			            if (p != null) {
 			            for (int r=0; r<configHandler.interestGroups[0].length;r++) {
 			            if (Bankcraft.perms.has(p, "bankcraft.interest."+configHandler.interestGroups[0][r])) {
-			            	interestxp = new Double(configHandler.interestGroups[2][r]);
+			            	if (new Double(stt)>=0) {
+				            	interestxp = new Double(configHandler.interestGroups[2][r]);
+				            	} else {
+				            		p.damage(configHandler.loandamage);
+				            		interestxp = new Double(configHandler.interestGroups[4][r]);
+				            	}
+			            }
 			            }
 			            }
 			            
@@ -85,7 +115,11 @@ public class ZinsenTimerTask extends TimerTask{
 			   frt.close();
 			   readert.close();
 	        writer = new FileWriter(filet);
+	        if (betragt <= configHandler.limitxp || configHandler.limitxp == -1) {
 		       writer.write(betragt.intValue()+System.getProperty("line.separator"));
+	        } else {
+	        	writer.write(stt);
+	        }
 		       writer.flush();
 		       writer.close();
 		       if (configHandler.broadcastxp == true) {
@@ -93,8 +127,12 @@ public class ZinsenTimerTask extends TimerTask{
 			       for (int j =0; j< playerArrayt.length; j++) {
 			    	   fB = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts"+System.getProperty("file.separator")+playerArray[j].getName()+".db");
 			    	   if ( fB.isFile() == true && fB.equals(filet)) {
-			    		   playerArray[j].sendMessage((configHandler.interestxpmsg.replace("%interest", zinsent.intValue()+"")).replace("%balance", betragt.intValue()+""));
-			    	   }
+			    		   if (betragt <= configHandler.limitxp || configHandler.limitxp == -1) {
+		     	  		   p.sendMessage(configHandler.getMessage(configHandler.interestxpmsg, p.getName(), zinsent));
+			    		   } else {
+			    			   p.sendMessage(configHandler.getMessage(configHandler.interestlimitmsgxp, p.getName(), zinsent));
+			    		   }
+		     	  		   }
 			       }
 			       }
 			}

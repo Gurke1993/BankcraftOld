@@ -80,6 +80,14 @@ public class BankcraftBlockListener implements Listener {
 		      return false;  
 		   }  
 		}  
+	public boolean isPositive( String input )  {  
+if (isDouble(input)) {
+	if (new Double(input)>=0) {
+	return true;
+	}
+}
+	return false;
+		} 
 
 	
 	
@@ -169,7 +177,7 @@ public class BankcraftBlockListener implements Listener {
         String ersteReihe = event.getLine(0);
     	if (ersteReihe.equalsIgnoreCase("[Bank]")) {
         	if (Bankcraft.perms.has(p, "bankcraft.admin")) {
-    		if (((event.getLine(1).equals(configHandler.depositsign) | event.getLine(1).equals(configHandler.debitsign)| event.getLine(1).equals(configHandler.debitsignxp)| event.getLine(1).equals(configHandler.depositsignxp)) & (isDouble(event.getLine(2))) | event.getLine(2).equalsIgnoreCase("all")) == true) {
+    		if (((event.getLine(1).equals(configHandler.depositsign) | event.getLine(1).equals(configHandler.debitsign)| event.getLine(1).equals(configHandler.debitsignxp)| event.getLine(1).equals(configHandler.depositsignxp)) && (isPositive(event.getLine(2))) || event.getLine(2).equalsIgnoreCase("all")) == true) {
     	        //ERSTELLEN DER BANK
     	    	event.setLine(0,configHandler.bankcolor+"[Bank]");
      		   double betrag = 0;
@@ -225,9 +233,17 @@ public class BankcraftBlockListener implements Listener {
      		   int signY = event.getBlock().getY();
      		   int signZ = event.getBlock().getZ();
      		   if (event.getLine(1).equals(configHandler.balancesignxp)) {
+     			   if (event.getLine(2).isEmpty()) {
          		   speichern(signX,signY,signZ,5,event.getBlock().getWorld(),"0");   
+     			   } else {
+             		   speichern(signX,signY,signZ,11,event.getBlock().getWorld(),"0");   
+     			   }
      		   } else {
+     			   if (event.getLine(2).isEmpty()) {
      		   speichern(signX,signY,signZ,0,event.getBlock().getWorld(),"0");
+     			   } else {
+             		   speichern(signX,signY,signZ,10,event.getBlock().getWorld(),"0");   
+     			   }
      		   }
      		   p.sendMessage(configHandler.make);
     		} else {

