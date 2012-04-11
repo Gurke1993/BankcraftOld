@@ -32,6 +32,9 @@ public Double betrag;
 		p.sendMessage("/bank debitxp AMOUNT           Debits XP from your Account");
 		p.sendMessage("/bank transfer PLAYER AMOUNT   Transfers money");
 		p.sendMessage("/bank transferxp PLAYER AMOUNT Transfers XP");
+		p.sendMessage("/bank exchange AMOUNT   		  Exchanges money to XP");
+		p.sendMessage("/bank exchangexp AMOUNT 		  Exchanges XP to money");
+		//Exchange
 	}
 	
 	public void sendAdminHelp(Player p) {
@@ -77,7 +80,7 @@ if (isDouble(input)) {
 		Player p;
 		p= (Player) sender;
 		if (p!=null) {
-			if (cmdlabel.equalsIgnoreCase("bank")) {
+			if (cmdlabel.equalsIgnoreCase("bank") || cmdlabel.equalsIgnoreCase("bc")) {
 				if (vars.length == 0) {
 					sendHelp(p);
 					return true;
@@ -104,7 +107,13 @@ if (isDouble(input)) {
 						if 	(signblock.getType() == Material.WALL_SIGN) {
 							Sign sign= (Sign)signblock.getState();
 							if (sign.getLine(0).contains("[Bank]")) {
-								if (sign.getLine(1).equalsIgnoreCase(configHandler.depositsign) || sign.getLine(1).equalsIgnoreCase(configHandler.debitsign) || sign.getLine(1).equalsIgnoreCase(configHandler.depositsignxp) || sign.getLine(1).equalsIgnoreCase(configHandler.debitsignxp)) {
+								Integer typsign = -1;
+								try {
+								typsign = bankInteract.getTypeBank(signblock.getX(), signblock.getY(), signblock.getZ(), signblock.getWorld());
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+								if ( typsign == 1 | typsign== 2| typsign== 6|typsign== 7|typsign == 12| typsign== 13) {
 								     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"banks.db");
 
 								     try {
@@ -142,6 +151,14 @@ if (isDouble(input)) {
 								            		if (typ== 7) {
 								            			list= sign.getLine(2)+","+vars[1];
 								            			typ= 9;
+								            		}
+								            		if (typ== 12) {
+								            			list= sign.getLine(2)+","+vars[1];
+								            			typ= 14;
+								            		}
+								            		if (typ== 13) {
+								            			list= sign.getLine(2)+","+vars[1];
+								            			typ= 15;
 								            		}
 								            		stringneu += cordX+":"+cordY+":"+cordZ+":"+cordW.getName()+":"+typ+":"+list+System.getProperty("line.separator");
 								            		p.sendMessage(configHandler.getMessage(configHandler.amountadded, p.getName(), 0D));
@@ -184,16 +201,26 @@ if (isDouble(input)) {
 							return true;
 			  		  }
 					
+					if (vars[0].equalsIgnoreCase(configHandler.comexchange) && (Bankcraft.perms.has(p, "bankcraft.command.exchange") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+						bankInteract.use(p, vars[1], 12, null, "");
+			  			   return true;
+					}
+					
+					if (vars[0].equalsIgnoreCase(configHandler.comexchangexp) && (Bankcraft.perms.has(p, "bankcraft.command.exchangexp") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
+					bankInteract.use(p, vars[1], 13, null, "");
+			  			   return true;
+					}
+					
 		
 				}else {
 			if (vars[0].equalsIgnoreCase(configHandler.combalance) && (Bankcraft.perms.has(p, "bankcraft.command.balance.other") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-					bankInteract.use(p, "", 0, null,vars[1]);
+					bankInteract.use(p, "", 10, null,vars[1]);
 					return true;
 			}
 			
 			
 			if (vars[0].equalsIgnoreCase(configHandler.combalancexp) && (Bankcraft.perms.has(p, "bankcraft.command.balancexp.other") ||  Bankcraft.perms.has(p, "bankcraft.command"))) {
-				  	bankInteract.use(p, "", 5, null,vars[1]);
+				  	bankInteract.use(p, "", 11, null,vars[1]);
 				  	return true;
   	  		   }
 	  		  }
@@ -257,7 +284,7 @@ if (isDouble(input)) {
 				return true;
 			} else {
 			
-			if (cmdlabel.equalsIgnoreCase("bankadmin")) {
+			if (cmdlabel.equalsIgnoreCase("bankadmin") || cmdlabel.equalsIgnoreCase("bcadmin")) {
 				if (vars.length==0) {
 					sendAdminHelp(p);
 					return true;
@@ -274,7 +301,17 @@ if (isDouble(input)) {
 
 							if (bankInteract.getBalance(vars[1])<0)
 		            		 bankInteract.stopLoanPunishment(vars[1]);
-		            		 bankInteract.kontoneu(0D, vars[1], true);
+							file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+vars[1]+".db");
+				                try {
+					                if (!file.exists()) {
+					                    file.createNewFile(); }
+					       writer = new FileWriter(file ,false);
+					       writer.write("0.00");
+					       writer.flush();
+					       writer.close();
+				                } catch (Exception e) {
+				                	e.printStackTrace();
+				                }
 		            	 
 						p.sendMessage(configHandler.color+configHandler.prefix+"Account cleared!");
 						return true;
@@ -282,7 +319,17 @@ if (isDouble(input)) {
 						if (vars[0].equalsIgnoreCase(configHandler.comadmclearxp) && (Bankcraft.perms.has(p, "bankcraft.command.clearxp") ||  Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
 							if (bankInteract.getBalanceXP(vars[1])<0)
 			            		 bankInteract.stopLoanPunishmentXP(vars[1]);
-							bankInteract.kontoneuxp(0, vars[1], true);
+							file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts"+System.getProperty("file.separator")+vars[1]+".db");
+					                try {
+						                if (!file.exists()) {
+						                    file.createNewFile(); }
+						       writer = new FileWriter(file ,false);
+						       writer.write("0.00");
+						       writer.flush();
+						       writer.close();
+					                } catch (Exception e) {
+					                	e.printStackTrace();
+					                }
 		            	 
 						p.sendMessage(configHandler.color+configHandler.prefix+"XP-Account cleared!");
 						return true;
@@ -318,7 +365,7 @@ if (isDouble(input)) {
 					                try{
 						                if (!file.exists()) {
 						                    file.createNewFile(); }
-					                	Double kontoxp = bankInteract.getBalanceXP(vars[1]);
+					                	Integer kontoxp = bankInteract.getBalanceXP(vars[1]);
 						       writer = new FileWriter(file ,false);
 						       writer.write(vars[2]);
 						       writer.flush();
@@ -376,6 +423,8 @@ if (isDouble(input)) {
 				return true;
 			}
 			}
+		} else {
+			Bankcraft.log.info("[Bankcraft] Please use this ingame!");
 		}
 		
 		return false;

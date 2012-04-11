@@ -91,16 +91,16 @@ public class ZinsenTimerTask extends TimerTask{
 			         FileReader frt = new FileReader(filet);
 			            BufferedReader readert = new BufferedReader(frt);
 			            String stt = readert.readLine(); 
-			            if (new Double(stt)>=0) {
-			            	interest = configHandler.interestxp;
+			            if (new Integer(stt)>=0) {
+			            	interestxp = configHandler.interestxp;
 			            } else {
-			            	interest = configHandler.loaninterestxp;
+			            	interestxp = configHandler.loaninterestxp;
 			            }
 			            p = Bankcraft.server.getPlayer(fileArrays[it].getName().toString().split(".db")[0]);
 			            if (p != null) {
 			            for (int r=0; r<configHandler.interestGroups[0].length;r++) {
 			            if (Bankcraft.perms.has(p, "bankcraft.interest."+configHandler.interestGroups[0][r])) {
-			            	if (new Double(stt)>=0) {
+			            	if (new Integer(stt)>=0) {
 				            	interestxp = new Double(configHandler.interestGroups[2][r]);
 				            	} else {
 				            		p.damage(configHandler.loandamage);

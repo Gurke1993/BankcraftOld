@@ -11,11 +11,11 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 
 public class configHandler{
-    public static Double interest,interestxp, limit, limitxp, maxloan, maxloanxp, loaninterest, loaninterestxp;
+    public static Double exchangerate,interest,interestxp, limit, limitxp, maxloan, maxloanxp, loaninterest, loaninterestxp;
     public static ChatColor bankcolor,color;
     public static Integer timer, loandamage;
     public static Boolean broadcast, broadcastxp, onlinemoney,onlinexp;
-    public static String balancexpother, balanceother, nowinloan, nowinloanxp, nolongerloanxp, nolongerloan, loangroup, loangroupxp, interestlimitmsg, interestlimitmsgxp, limitmsg, limitmsgxp, comhelp, combalance, combalancexp, comdeposit, comdebit, comdepositxp, comdebitxp, comtransfer, comtransferxp, comadmhelp, comadmset, comadmsetxp, comadmgrant, comadmgrantxp, comadmclear, comadmclearxp,amountadded, prefix, make, destroy, depositsign, debitsign, balancesign, depositsignxp, debitsignxp, balancesignxp, disallow, errorcreate, lowmoney1, lowmoney2, lowmoney3, success1, success2, balance, lowmoney1xp, lowmoney2xp, lowmoney3xp, success3, success3xp, success1xp, success2xp, balancexp, interestmsg, interestxpmsg;
+    public static String exchangesign, exchangesignxp, success4,success4xp,comexchange,comexchangexp,balancexpother, balanceother, nowinloan, nowinloanxp, nolongerloanxp, nolongerloan, loangroup, loangroupxp, interestlimitmsg, interestlimitmsgxp, limitmsg, limitmsgxp, comhelp, combalance, combalancexp, comdeposit, comdebit, comdepositxp, comdebitxp, comtransfer, comtransferxp, comadmhelp, comadmset, comadmsetxp, comadmgrant, comadmgrantxp, comadmclear, comadmclearxp,amountadded, prefix, make, destroy, depositsign, debitsign, balancesign, depositsignxp, debitsignxp, balancesignxp, disallow, errorcreate, lowmoney1, lowmoney2, lowmoney3, success1, success2, balance, lowmoney1xp, lowmoney2xp, lowmoney3xp, success3, success3xp, success1xp, success2xp, balancexp, interestmsg, interestxpmsg;
 	private static final ChatColor[] colors =  new ChatColor[]{ChatColor.AQUA, ChatColor.BLACK, ChatColor.BLUE, ChatColor.DARK_AQUA, ChatColor.DARK_BLUE, ChatColor.DARK_GRAY, ChatColor.DARK_GREEN, ChatColor.DARK_PURPLE, ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.GRAY, ChatColor.GREEN, ChatColor.LIGHT_PURPLE, ChatColor.RED, ChatColor.WHITE, ChatColor.YELLOW};
 	public static String [][] interestGroups;
 	private Bankcraft plugin;
@@ -28,6 +28,7 @@ public class configHandler{
 	public static String getMessage(String input, String pstring, Double amount) {
 		String output;
 		output = input;
+		output = output.replace("%exchangerate", exchangerate+"");
 		output = output.replace("%maxloanxp", maxloanxp+"");
 		output = output.replace("%maxloan", maxloan+"");
 		output = output.replace("%limitxp", limitxp+"");
@@ -49,6 +50,7 @@ public class configHandler{
 			}
 		}
 		if (amount != null) {
+			output = output.replace("%amountint", amount.intValue()+"");
 			output = output.replace("%amount", amount+"");
 		}
 		return output;
@@ -79,7 +81,7 @@ public class configHandler{
 		            	interestGroupsLoad4.add(st.split("=")[3]);
 		            	interestGroupsLoad5.add(st.split("=")[4]);
 		            }
-		            interestGroups = new String [3][interestGroupsLoad2.size()];
+		            interestGroups = new String [5][interestGroupsLoad2.size()];
 		            for (int i=0; i<interestGroups[1].length;i++) {
 		            	interestGroups[0][i] = interestGroupsLoad1.get(i);
 		            	interestGroups[1][i] = interestGroupsLoad2.get(i);
@@ -108,6 +110,7 @@ public class configHandler{
 		if (maxloanxp < 0) maxloanxp = 0D;
 		limit = this.plugin.getConfig().getDouble("general.limit");
 		limitxp = this.plugin.getConfig().getDouble("general.limitxp");
+		exchangerate = this.plugin.getConfig().getDouble("general.exchangerate");
 		interest = this.plugin.getConfig().getDouble("general.interest");
 		interestxp = this.plugin.getConfig().getDouble("general.interestxp");
 		onlinemoney = this.plugin.getConfig().getBoolean("general.justonlinemoney");
@@ -115,6 +118,8 @@ public class configHandler{
 		broadcast = this.plugin.getConfig().getBoolean("general.broadcast");
 		broadcastxp = this.plugin.getConfig().getBoolean("general.broadcastxp");
 	    timer = this.plugin.getConfig().getInt("general.timer");
+		exchangesign = this.plugin.getConfig().getString("language.exchangesign");
+		exchangesignxp = this.plugin.getConfig().getString("language.exchangesignxp");
 		depositsign = this.plugin.getConfig().getString("language.depositsign");
 		debitsign = this.plugin.getConfig().getString("language.debitsign");
 		balancesign = this.plugin.getConfig().getString("language.balancesign");
@@ -140,6 +145,8 @@ public class configHandler{
 		success1xp = (color+prefix+this.plugin.getConfig().getString("language.success1xp"));
 		success2xp = (color+prefix+this.plugin.getConfig().getString("language.success2xp"));
 		success3xp = (color+prefix+this.plugin.getConfig().getString("language.success3xp"));
+		success4 = (color+prefix+this.plugin.getConfig().getString("language.success4"));
+		success4xp = (color+prefix+this.plugin.getConfig().getString("language.success4xp"));
 		balancexp = (color+prefix+this.plugin.getConfig().getString("language.balancexp"));
 		interestmsg = (color+prefix+this.plugin.getConfig().getString("language.interestmsg"));
 		interestxpmsg = (color+prefix+this.plugin.getConfig().getString("language.interestxpmsg"));
@@ -153,6 +160,8 @@ public class configHandler{
 		comdebitxp = (this.plugin.getConfig().getString("command.user.debitxp"));
 		comtransfer = (this.plugin.getConfig().getString("command.user.transfer"));
 		comtransferxp = (this.plugin.getConfig().getString("command.user.transferxp"));
+		comexchange = (this.plugin.getConfig().getString("command.user.exchange"));
+		comexchangexp = (this.plugin.getConfig().getString("command.user.exchangexp"));
 		comadmhelp = (this.plugin.getConfig().getString("command.admin.help"));
 		comadmset = (this.plugin.getConfig().getString("command.admin.set"));
 		comadmsetxp = (this.plugin.getConfig().getString("command.admin.setxp"));
@@ -185,6 +194,9 @@ public class configHandler{
 			if(!config.contains("general.interestxp")) {
 				config.set("general.interestxp", 0.005);
 			}
+			if(!config.contains("general.exchangerate")) {
+				config.set("general.exchangerate", 0.05);
+				}
 			if(!config.contains("general.limit")) {
 				config.set("general.limit", -1);
 				}
@@ -254,6 +266,12 @@ public class configHandler{
 			if(!config.contains("language.debitsignxp")) {
 				config.set("language.debitsignxp", "XPDebit");
 			}
+			if(!config.contains("language.exchangesign")) {
+				config.set("language.exchangesign", "Exchange");
+			}
+			if(!config.contains("language.exchangesignxp")) {
+				config.set("language.exchangesignxp", "XPExchange");
+			}
 			if(!config.contains("language.make")) {
 				config.set("language.make", "Bank created!");
 				}
@@ -284,6 +302,9 @@ public class configHandler{
 			if(!config.contains("language.success3")) {
 				config.set("language.success3", "Money transfered!");
 				}
+			if(!config.contains("language.success4")) {
+				config.set("language.success4", "%amount Dollars exchanged! You now have %balancexp Experience banked!");
+				}
 			if(!config.contains("language.balance")) {
 				config.set("language.balance", "Balance: %balance Dollar");
 				}
@@ -311,14 +332,17 @@ public class configHandler{
 			if(!config.contains("language.success3xp")) {
 				config.set("language.success3xp", "Experience transfered!");
 				}
+			if(!config.contains("language.success4xp")) {
+				config.set("language.success4xp", "%amount Experience exchanged! You now have %balance Dollars!");
+				}
 			if(!config.contains("language.balancexp")) {
 				config.set("language.balancexp", "Banked experience: %balancexp XP");
 			}
 			if(!config.contains("language.interestmsg")) {
-				config.set("language.interestmsg", "%amount money granted! You know have %balance!");
+				config.set("language.interestmsg", "%amount money granted! You now have %balance!");
 			}
 			if(!config.contains("language.interestxpmsg")) {
-				config.set("language.interestxpmsg", "%amount XP granted! You know have %balance!");
+				config.set("language.interestxpmsg", "%amountint XP granted! You now have %balancexp!");
 			}
 			if(!config.contains("language.amountadded")) {
 				config.set("language.amountadded", "Your value was successfully added to the sign!");
@@ -327,13 +351,13 @@ public class configHandler{
 				config.set("language.nolongerloan", "You payed your depts!");
 			}
 			if(!config.contains("language.nowinloan")) {
-				config.set("language.nowinloan", "You know have debts!");
+				config.set("language.nowinloan", "You now have debts!");
 			}
 			if(!config.contains("language.nolongerloanxp")) {
 				config.set("language.nolongerloanxp", "You payed your XP-depts!");
 			}
 			if(!config.contains("language.nowinloanxp")) {
-				config.set("language.nowinloanxp", "You know have XP-debts!");
+				config.set("language.nowinloanxp", "You now have XP-debts!");
 			}
 			if(!config.contains("command.user.help")) {
 				config.set("command.user.help", "help");
@@ -361,6 +385,12 @@ public class configHandler{
 			}
 			if(!config.contains("command.user.transferxp")) {
 				config.set("command.user.transferxp", "transferxp");
+			}
+			if(!config.contains("command.user.exchange")) {
+				config.set("command.user.exchange", "exchange");
+			}
+			if(!config.contains("command.user.exchangexp")) {
+				config.set("command.user.exchangexp", "exchangexp");
 			}
 			if(!config.contains("command.admin.help")) {
 				config.set("command.admin.help", "help");

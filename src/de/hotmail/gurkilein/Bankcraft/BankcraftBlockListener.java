@@ -177,7 +177,7 @@ if (isDouble(input)) {
         String ersteReihe = event.getLine(0);
     	if (ersteReihe.equalsIgnoreCase("[Bank]")) {
         	if (Bankcraft.perms.has(p, "bankcraft.admin")) {
-    		if (((event.getLine(1).equals(configHandler.depositsign) | event.getLine(1).equals(configHandler.debitsign)| event.getLine(1).equals(configHandler.debitsignxp)| event.getLine(1).equals(configHandler.depositsignxp)) && (isPositive(event.getLine(2))) || event.getLine(2).equalsIgnoreCase("all")) == true) {
+    		if (((event.getLine(1).equals(configHandler.depositsign) | event.getLine(1).equals(configHandler.exchangesign) | event.getLine(1).equals(configHandler.exchangesignxp) | event.getLine(1).equals(configHandler.debitsign)| event.getLine(1).equals(configHandler.debitsignxp)| event.getLine(1).equals(configHandler.depositsignxp)) && (isPositive(event.getLine(2))) || event.getLine(2).equalsIgnoreCase("all")) == true) {
     	        //ERSTELLEN DER BANK
     	    	event.setLine(0,configHandler.bankcolor+"[Bank]");
      		   double betrag = 0;
@@ -222,6 +222,24 @@ if (isDouble(input)) {
                 		   betrag = new Double(event.getLine(2));
             		   }
         			   typ = 7;
+        		   }
+        		   if (typreihe.equals(configHandler.exchangesign)) {
+            		   if (event.getLine(2).equalsIgnoreCase("all")) {
+            			   event.setLine(2, "All");
+            			   betrag = -1;
+            		   } else {
+                		   betrag = new Double(event.getLine(2));
+            		   }
+        			   typ = 12;
+        		   }
+        		   if (typreihe.equals(configHandler.exchangesignxp)) {
+            		   if (event.getLine(2).equalsIgnoreCase("all")) {
+            			   event.setLine(2, "All");
+            			   betrag = -1;
+            		   } else {
+                		   betrag = new Double(event.getLine(2));
+            		   }
+        			   typ = 13;
         		   }
         		   speichern(signX,signY,signZ,typ,event.getBlock().getWorld(),betrag+"");
           		   p.sendMessage(configHandler.make);

@@ -50,6 +50,8 @@ public class Bankcraft extends JavaPlugin{
 		BankcraftCommandListener bcl= new BankcraftCommandListener(this);
 		getCommand("bank").setExecutor(bcl);
 		getCommand("bankadmin").setExecutor(bcl);
+		getCommand("bc").setExecutor(bcl);
+		getCommand("bcadmin").setExecutor(bcl);
 	    toggleTimerTask();
 		log.info("[Bankcraft] Bankcraft has been enabled!");
 	}

@@ -146,8 +146,8 @@ public class bankInteract {
     	return balance;
     }
     
-    public static Double getBalanceXP(String pstring) {
-    	Double balancexp = null;
+    public static Integer getBalanceXP(String pstring) {
+    	Integer balancexp = null;
     	
 		   File ft = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts"+System.getProperty("file.separator")+pstring+".db");
   try {
@@ -157,7 +157,7 @@ public class bankInteract {
   st = readert.readLine();
   frt.close();
   readert.close();
-  balancexp = new Double(st);
+  balancexp = new Integer(st);
   } catch (Exception e) {
  	 e.printStackTrace();
   }
@@ -165,14 +165,98 @@ public class bankInteract {
     	return balancexp;
     }
     
+    public static boolean deposit(Player sender, Boolean money, String amountstr) {
+    	//Boolean all = false;
+    	
+    	double amount = 0D;
+   	   if (amountstr.equalsIgnoreCase("all")) {
+   		   if (money)
+   			   amount = (Double)Bankcraft.econ.getBalance(sender.getName());
+   		   else
+   			   amount = bankInteract.getTotalXp(sender);
+  	   } else {
+      amount = new Double(amountstr);
+  	   }
+   	   //MONEY DEPOSIT
+   	   if (money) {
+		   if (configHandler.limit == -1 || configHandler.limit >= amount+bankInteract.getBalance(sender.getName())) {
+			   if (Bankcraft.econ.getBalance(sender.getName()) >= amount) {
+       EconomyResponse r1 = Bankcraft.econ.withdrawPlayer(sender.getName(), amount);
+       if (r1.transactionSuccess()) {
+      	 bankInteract.kontoneu(amount,sender.getName(),false);
+      	 if (bankInteract.getBalance(sender.getName())>=0 && (bankInteract.getBalance(sender.getName())-amount)<0) {
+      		 bankInteract.stopLoanPunishment(sender.getName());
+      	 }
+       }
+	  		   sender.sendMessage(configHandler.getMessage(configHandler.success1, sender.getName(), amount));
+	  		   return true;
+       } else {
+	  		   sender.sendMessage(configHandler.getMessage(configHandler.lowmoney1, sender.getName(), amount));
+       }
+		   } else {
+			   sender.sendMessage(configHandler.getMessage(configHandler.limitmsg, sender.getName(), amount));
+		   }
+   	   } else {
+   		   //XP DEPOSIT
+		   if (configHandler.limitxp == -1 || configHandler.limitxp >= amount+bankInteract.getBalanceXP(sender.getName())) {
+		         if (bankInteract.getTotalXp(sender) >= amount) {
+		      	   bankInteract.removeExp(sender, (int)amount);
+		      	   bankInteract.kontoneuxp((int)amount,sender.getName(),false);
+		        	 if (bankInteract.getBalanceXP(sender.getName())>=0 && bankInteract.getBalanceXP(sender.getName())-amount<0) {
+		      		 bankInteract.stopLoanPunishmentXP(sender.getName());
+		      	 }
+			  		   sender.sendMessage(configHandler.getMessage(configHandler.success1xp, sender.getName(), amount));
+					  } else {
+			  		   sender.sendMessage(configHandler.getMessage(configHandler.lowmoney1xp, sender.getName(), amount));
+					  }
+				   } else {
+					   sender.sendMessage(configHandler.getMessage(configHandler.limitmsgxp, sender.getName(), amount));
+				   }
+   	   }
+    	return false;
+    	
+    }
+    
+    public static boolean debit(Player sender, Boolean money, String amount) {
+    	return true;
+    	
+    }
+    
+    public static boolean balance(Player sender, Boolean money, String pstring) {
+   				String nachricht = "";
+  				if (sender.getName().equals(pstring)) {
+  					if (money) {
+  					nachricht = configHandler.balance;
+  					bankInteract.kontoneu(0D,pstring,false);
+  				} else {
+  					nachricht = configHandler.balancexp;
+  					bankInteract.kontoneuxp(0,pstring,false);
+   				}
+    } else {
+  				if (money) {
+  					nachricht = configHandler.balanceother;
+  							bankInteract.kontoneu(0D, pstring, false);
+  				} else {
+  					nachricht = configHandler.balancexpother;
+  					bankInteract.kontoneuxp(0, pstring, false);
+  				}
+    }
+
+  	  		   sender.sendMessage(configHandler.getMessage(nachricht, pstring, 0D));
+    	return true;
+    	
+    }
+    
 	  public static String kontoneu(Double betrag,String pstring, Boolean all){
 		  FileWriter writer;
-		  File file;
+		  File file,fileparent;
 		  String enough = "error";
 		    // File anlegen
+		  fileparent = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts");
 		     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"Accounts"+System.getProperty("file.separator")+pstring+".db");
 		     try {
 	                if (!file.exists()) {
+	                	fileparent.mkdir();
 	                    file.createNewFile();
 	                    writer = new FileWriter(file, true);
 	                    writer.write("0.00");
@@ -222,6 +306,10 @@ public class bankInteract {
 		   * 9= debitxp Scroll
 		   * 10= balance other
 		   * 11 = balancexp other
+		   * 12 = exchange
+		   * 13= exchangexp
+		   * 14= exchangeS
+		   * 15= exchangexpS
 		   */
 		  
 			Boolean all = false;
@@ -251,7 +339,8 @@ public class bankInteract {
    			} else {
    				//transfer sign
    				Double betrag = 0.00;
-      if (typ == 3 | typ == 4 | typ == 8 | typ == 9) {
+      if (typ == 3 | typ == 4 | typ == 8 | typ == 9 | typ == 14 | typ == 15) {
+    	  // S-sign
 	   betragstring = updateSign(b,0);
       }
   	   if (betragstring.equalsIgnoreCase("all")) {
@@ -261,6 +350,7 @@ public class bankInteract {
       betrag = new Double(betragstring);
   	   }
 	   if (typ == 1 | typ == 3) {
+		   //Deposit
 		   if (all == true) {
 			   betrag = (Double)Bankcraft.econ.getBalance(p.getName());
 		   }
@@ -282,6 +372,7 @@ public class bankInteract {
 		   }
 	   }
 	   if (typ == 6 | typ == 8) {
+		   //Deposit XP
 		   if (all == true) {
 			   betrag = bankInteract.getTotalXp(p);
 		   }
@@ -302,6 +393,7 @@ public class bankInteract {
 	   }
 	   
 	  if (typ == 2 | typ == 4) {
+		  //Debit
 		String differenzstring = bankInteract.kontoneu(-betrag,p.getName(),all);
 		  if (!differenzstring.equals("error")) {
 			  Double differenz = new Double(differenzstring);
@@ -317,6 +409,7 @@ public class bankInteract {
 		  }
 	  }
 	  if (typ == 7 | typ == 9) {
+		  //Debit XP
 		String differenzstring = bankInteract.kontoneuxp(-betrag.intValue(),p.getName(),all);
 		  if (!differenzstring.equals("error")) {
 			  Integer differenz = new Integer(differenzstring);
@@ -329,20 +422,69 @@ public class bankInteract {
 	  		   p.sendMessage(configHandler.getMessage(configHandler.lowmoney2xp, p.getName(), betrag));
          }
 	  }
-   			}
-		  
+	  if (typ == 12 | typ == 14) {
+		  //exchange
+		  	String differenzstring = bankInteract.kontoneu(-betrag,p.getName(),all);
+	  			  if (!differenzstring.equals("error")) {
+	  				  Integer betragneu = (int)(new Double(differenzstring)*configHandler.exchangerate);
+	  				  if (configHandler.limitxp == -1 || configHandler.limitxp>=betragneu+getBalanceXP(p.getName())) {
+	             	 if (bankInteract.getBalance(p.getName())<0 && bankInteract.getBalance(p.getName())+new Double(differenzstring)>=0) {
+	            		 bankInteract.startLoanPunishment(p.getName());
+	            	 }
+					
+		            	 bankInteract.kontoneuxp(betragneu,p.getName(),false);
+		            	 if (bankInteract.getBalanceXP(p.getName())>=0 && bankInteract.getBalanceXP(p.getName())-betragneu<0) {
+		            		 bankInteract.stopLoanPunishmentXP(p.getName());
+		            	 }
+		     	  		   p.sendMessage(configHandler.getMessage(configHandler.success4, p.getName(), betrag));
+	  				  } else {
+	  					bankInteract.kontoneu(new Double(differenzstring),p.getName(),false);
+		     	  		   p.sendMessage(configHandler.getMessage(configHandler.limitmsgxp, p.getName(), betrag));
+	  				  }
+	                   
+	  			  } else {
+	     	  		   p.sendMessage(configHandler.getMessage(configHandler.lowmoney2, p.getName(), betrag));
+	  			  }
+	  }
+	  if (typ == 13 | typ == 15) {
+		  //exchangexp
+		  	String differenzstring = bankInteract.kontoneuxp(-betrag.intValue(),p.getName(),all);
+	  			  if (!differenzstring.equals("error")) {
+	  				  Double betragneu = new Double(differenzstring)/configHandler.exchangerate;
+	  				  if (configHandler.limit == -1 || configHandler.limit>=betragneu+getBalance(p.getName())) {
+	             	 if (bankInteract.getBalanceXP(p.getName())<0 && bankInteract.getBalanceXP(p.getName())+new Double(differenzstring)>=0) {
+	            		 bankInteract.startLoanPunishmentXP(p.getName());
+	            	 }
+					
+		            	 bankInteract.kontoneu(betragneu,p.getName(),false);
+		            	 if (bankInteract.getBalance(p.getName())>=0 && bankInteract.getBalance(p.getName())-betragneu<0) {
+		            		 bankInteract.stopLoanPunishment(p.getName());
+		            	 }
+		     	  		   p.sendMessage(configHandler.getMessage(configHandler.success4xp, p.getName(), betrag));
+	  				  } else {
+		     	  		   p.sendMessage(configHandler.getMessage(configHandler.limitmsg, p.getName(), betrag));
+		  					bankInteract.kontoneuxp(new Integer(differenzstring),p.getName(),false);
+	  				  }
+	                   
+	  			  } else {
+	     	  		   p.sendMessage(configHandler.getMessage(configHandler.lowmoney2xp, p.getName(), betrag));
+	  			  }
+	  }
+	  }
 		  return false;
 	  
 }
 	  
 	  public static String kontoneuxp(Integer betrag,String pstring, Boolean all){
 		  FileWriter writer;
-		  File file;
+		  File file, fileparent;
 		  String enough ="error";
 		    // File anlegen
+		  fileparent = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts");
 		     file = new File("plugins"+System.getProperty("file.separator")+"Bankcraft"+System.getProperty("file.separator")+"XPAccounts"+System.getProperty("file.separator")+pstring+".db");
 		     try {
 	                if (!file.exists()) {
+	                	fileparent.mkdir();
 	                    file.createNewFile();
 	                    writer = new FileWriter(file, true);
 	                    writer.write("0");
