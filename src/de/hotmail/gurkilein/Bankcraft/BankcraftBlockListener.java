@@ -36,7 +36,7 @@ public class BankcraftBlockListener implements Listener {
 		       writer.write(System.getProperty("line.separator"));     
 		       writer.flush();
 		       
-		       // Schlieﬂt den Stream
+		       // Schlie??t den Stream  English please !
 		       writer.close();
 		    } catch (IOException e) {
 		      e.printStackTrace();
@@ -137,7 +137,7 @@ if (isDouble(input)) {
     }
     }
 	String block = event.getBlock().getType().toString();
-    if (block == "WALL_SIGN") {
+    if ("WALL_SIGN".equals(block)) {
     	Sign sign = ((Sign)event.getBlock().getState());
     	if (sign.getLine(0).contains("[Bank]")) {
 	          if (p.getGameMode().equals(GameMode.CREATIVE) && !p.isSneaking()) {

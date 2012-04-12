@@ -107,5 +107,9 @@ public class Bankcraft extends JavaPlugin{
     	return false;
 }
 
+	public void disablePlugin() {
+		setEnabled(false);
+	}
+
 }
 

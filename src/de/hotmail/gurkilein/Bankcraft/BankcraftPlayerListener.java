@@ -30,7 +30,7 @@ public class BankcraftPlayerListener implements Listener {
 		       writer.write(System.getProperty("line.separator"));     
 		       writer.flush();
 		       
-		       // Schlieﬂt den Stream
+		       // Schlie??t den Stream !!!  please no special chars, I'm using utf8 ^^ !!
 		       writer.close();
 		    } catch (IOException e) {
 		      e.printStackTrace();
