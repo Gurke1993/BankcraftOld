@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -46,18 +47,24 @@ public class configHandler {
 		output = output.replace("%limit", limit + "");
 		if (!pstring.equals("")) {
 			output = output.replace("%player", pstring);
-			if (new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db").exists()) {
+			if (isMysql()){
 				output = output.replace("%balancexp", bankInteract.getBalanceXP(pstring) + "");
-			}
-			if (new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "Accounts" + System.getProperty("file.separator") + pstring + ".db").exists()) {
 				output = output.replace("%balance", bankInteract.getBalance(pstring) + "");
+				output = output.replace("%pocketxp", bankInteract.getTotalXp(Bankcraft.server.getPlayer(pstring)) + "");
+			}
+			else {
+				if (new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db").exists()) {
+					output = output.replaceAll("%balancexp", bankInteract.getBalanceXP(pstring) + "");
+				}
+				if (new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "Accounts" + System.getProperty("file.separator") + pstring + ".db").exists()) {
+					output = output.replace("%balance", bankInteract.getBalance(pstring) + "");
+				}
+			}
+			if (Bankcraft.econ.hasAccount(pstring)) {
+					output = output.replace("%pocket", Bankcraft.econ.getBalance(pstring) + "");
 			}
 			if (Bankcraft.server.getPlayer(pstring) != null) {
 				output = output.replace("%pocketxp", bankInteract.getTotalXp(Bankcraft.server.getPlayer(pstring)) + "");
-			}
-
-			if (Bankcraft.econ.hasAccount(pstring)) {
-				output = output.replace("%pocket", Bankcraft.econ.getBalance(pstring) + "");
 			}
 		}
 		if (amount != null) {
@@ -198,9 +205,9 @@ public class configHandler {
 			String url = plugin.getConfig().getString("database.url");
 			String user = plugin.getConfig().getString("database.user");
 			String password = plugin.getConfig().getString("database.password");
-			String prefix = plugin.getConfig().getString("database.prefix");
+			String dbPrefix = plugin.getConfig().getString("database.prefix");
 			if (plugin.isEnabled()) {
-				this.database = new BcMysql(plugin, url, user, password, prefix);
+				configHandler.database = new BcMysql(plugin, url, user, password, dbPrefix);
 			}
 		} else {
 			plugin.getLogger().info("File storage selected");

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.milkbowl.vault.economy.EconomyResponse;
-import org.bukkit.Server;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -22,7 +21,7 @@ import org.bukkit.entity.Player;
 public class bankInteract {
 
 	@SuppressWarnings("unused")
-	private Bankcraft plugin;
+	private static Bankcraft plugin;
 	public static Map<Block, Integer> signPosition = new HashMap<Block, Integer>();
 
 	public bankInteract(Bankcraft b1) {
@@ -110,18 +109,28 @@ public class bankInteract {
 
 	public static Integer getTypeBank(Integer cordX1, Integer cordY1, Integer cordZ1, World cordW1) throws Exception {
 		Integer type = -1;
-		File f = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "banks.db");
-		f.createNewFile();
-		FileReader fr = new FileReader(f);
-		BufferedReader reader = new BufferedReader(fr);
-		String st = "";
-		while ((st = reader.readLine()) != null) {
-			Integer cordX = new Integer(st.split(":")[0]);
-			Integer cordY = new Integer(st.split(":")[1]);
-			Integer cordZ = new Integer(st.split(":")[2]);
-			World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
-			if ((cordX.equals(cordX1)) & (cordY.equals(cordY1)) & (cordZ.equals(cordZ1)) & (cordW.equals(cordW1))) {
-				type = new Integer(st.split(":")[4]);
+		if (configHandler.isMysql()) {
+			// MySQL
+			boolean exist = configHandler.getDb().getBank(cordX1, cordY1, cordZ1, cordW1.getName());
+			if(exist){
+				type = configHandler.getDb().getTypeOfBank(cordX1, cordY1, cordZ1, cordW1.getName());
+			}
+		}
+		else {
+			// File
+			File f = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "banks.db");
+			f.createNewFile();
+			FileReader fr = new FileReader(f);
+			BufferedReader reader = new BufferedReader(fr);
+			String st = "";
+			while ((st = reader.readLine()) != null) {
+				Integer cordX = new Integer(st.split(":")[0]);
+				Integer cordY = new Integer(st.split(":")[1]);
+				Integer cordZ = new Integer(st.split(":")[2]);
+				World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
+				if ((cordX.equals(cordX1)) & (cordY.equals(cordY1)) & (cordZ.equals(cordZ1)) & (cordW.equals(cordW1))) {
+					type = new Integer(st.split(":")[4]);
+				}
 			}
 		}
 		return type;
@@ -152,21 +161,27 @@ public class bankInteract {
 	}
 
 	public static Integer getBalanceXP(String pstring) {
+
 		Integer balancexp = null;
-
-		File ft = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db");
-		try {
-			FileReader frt = new FileReader(ft);
-			BufferedReader readert = new BufferedReader(frt);
-			String st = "";
-			st = readert.readLine();
-			frt.close();
-			readert.close();
+		if (configHandler.isMysql()) {
+			String st = configHandler.getDb().getXpBalance(pstring);
 			balancexp = new Integer(st);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-
+		else {
+			File ft = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db");
+			try {
+				FileReader frt = new FileReader(ft);
+				BufferedReader readert = new BufferedReader(frt);
+				String st = "";
+				st = readert.readLine();
+				frt.close();
+				readert.close();
+				balancexp = new Integer(st);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
 		return balancexp;
 	}
 
@@ -276,6 +291,7 @@ public class bankInteract {
 					betrag = 0.00;
 					enough = st;
 				}
+				configHandler.getDb().deposit(betrag.toString(), pstring);
 			}
 		}
 		// FILE
@@ -386,6 +402,8 @@ public class bankInteract {
 			if (typ == 5) {
 				nachricht = configHandler.balancexp;
 				bankInteract.kontoneuxp(0, p.getName(), false);
+				Double test = 0D;
+				plugin.getLogger().info(test.toString());
 				p.sendMessage(configHandler.getMessage(nachricht, p.getName(), 0D));
 			}
 			if (typ == 10) {
@@ -538,25 +556,16 @@ public class bankInteract {
 	}
 
 	public static String kontoneuxp(Integer betrag, String pstring, Boolean all) {
-		FileWriter writer;
-		File file, fileparent;
 		String enough = "error";
-		// File anlegen
-		fileparent = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts");
-		file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db");
-		try {
-			if (!file.exists()) {
-				fileparent.mkdir();
-				file.createNewFile();
-				writer = new FileWriter(file, true);
-				writer.write("0");
-				writer.write(System.getProperty("line.separator"));
-				writer.flush();
-				writer.close();
+		
+		// MySQL
+		if (configHandler.isMysql()) {
+			// get if player xp_account is in database
+			boolean exist = configHandler.getDb().getXpAccount(pstring);
+			if(!exist){
+				configHandler.getDb().setXpAccount(pstring, Integer.toString(betrag));
 			}
-			FileReader fr = new FileReader(file);
-			BufferedReader reader = new BufferedReader(fr);
-			String st = reader.readLine();
+			String st = configHandler.getDb().getXpBalance(pstring);
 			if (new Integer(st) + configHandler.maxloanxp >= -betrag) {
 				enough = (-betrag) + "";
 				betrag += new Integer(st);
@@ -568,45 +577,85 @@ public class bankInteract {
 				betrag = 0;
 				enough = st;
 			}
-			fr.close();
-			reader.close();
-			writer = new FileWriter(file);
-			writer.write(betrag + System.getProperty("line.separator"));
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+			configHandler.getDb().depositXp(betrag.toString(), pstring);
 		}
+		else {
+			FileWriter writer;
+			File file, fileparent;
+			// File anlegen
+			fileparent = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts");
+			file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db");
+			try {
+				if (!file.exists()) {
+					fileparent.mkdir();
+					file.createNewFile();
+					writer = new FileWriter(file, true);
+					writer.write("0");
+					writer.write(System.getProperty("line.separator"));
+					writer.flush();
+					writer.close();
+				}
+				FileReader fr = new FileReader(file);
+				BufferedReader reader = new BufferedReader(fr);
+				String st = reader.readLine();
+				if (new Integer(st) + configHandler.maxloanxp >= -betrag) {
+					enough = (-betrag) + "";
+					betrag += new Integer(st);
+				} else {
+					betrag = new Integer(st);
+					enough = "error";
+				}
+				if (all == true && new Integer(st) >= -betrag) {
+					betrag = 0;
+					enough = st;
+				}
+				fr.close();
+				reader.close();
+				writer = new FileWriter(file);
+				writer.write(betrag + System.getProperty("line.separator"));
+				writer.flush();
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+			
 		return enough;
 	}
 
 	public static Object[] getScrollingArray(Block block) {
 		String liststring = null;
-		File file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "banks.db");
-		try {
-			Integer x, y, z;
-			x = block.getX();
-			y = block.getY();
-			z = block.getZ();
-			World w = block.getWorld();
-			FileReader fr = new FileReader(file);
-			BufferedReader reader = new BufferedReader(fr);
-			String st = "";
-			while ((st = reader.readLine()) != null) {
-				Integer cordX = new Integer(st.split(":")[0]);
-				Integer cordY = new Integer(st.split(":")[1]);
-				Integer cordZ = new Integer(st.split(":")[2]);
-				World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
-				if (cordX.equals(x) && cordY.equals(y) && cordZ.equals(z) && cordW.equals(w)) {
-					liststring = st.split(":")[5];
-				}
-			}
-			fr.close();
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		Integer x, y, z;
+		x = block.getX();
+		y = block.getY();
+		z = block.getZ();
+		World w = block.getWorld();
+		if (configHandler.isMysql()) {
+			// MySQL 
+			liststring = configHandler.getDb().getAmountsOfBank(x, y, z, w.getName());
 		}
-
+		else {
+			// File
+			File file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "banks.db");
+			try {
+				FileReader fr = new FileReader(file);
+				BufferedReader reader = new BufferedReader(fr);
+				String st = "";
+				while ((st = reader.readLine()) != null) {
+					Integer cordX = new Integer(st.split(":")[0]);
+					Integer cordY = new Integer(st.split(":")[1]);
+					Integer cordZ = new Integer(st.split(":")[2]);
+					World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
+					if (cordX.equals(x) && cordY.equals(y) && cordZ.equals(z) && cordW.equals(w)) {
+						liststring = st.split(":")[5];
+					}
+				}
+				fr.close();
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 		List<String> loadArray = new ArrayList<String>();
 		for (int i = 0; i < liststring.split(",").length; i++) {

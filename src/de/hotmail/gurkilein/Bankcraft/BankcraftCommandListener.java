@@ -14,7 +14,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 public class BankcraftCommandListener implements CommandExecutor {
 
@@ -112,65 +111,107 @@ public class BankcraftCommandListener implements CommandExecutor {
 										e.printStackTrace();
 									}
 									if (typsign == 1 | typsign == 2 | typsign == 6 | typsign == 7 | typsign == 12 | typsign == 13) {
-										file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "banks.db");
-
-										try {
-											String stringneu = "";
-											FileReader fr = new FileReader(file);
-											BufferedReader reader = new BufferedReader(fr);
-											String st = "";
-											while ((st = reader.readLine()) != null) {
-
-												Integer cordX = new Integer(st.split(":")[0]);
-												Integer cordY = new Integer(st.split(":")[1]);
-												Integer cordZ = new Integer(st.split(":")[2]);
-												Integer typ = new Integer(st.split(":")[4]);
-												String list = st.split(":")[5];
-												Block block = p.getTargetBlock(null, 100);
-
-												World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
-												if (!(cordX == block.getX() & cordY == block.getY() & cordZ == block.getZ() && cordW.equals(block.getWorld()))) {
-													stringneu += st + System.getProperty("line.separator");
-												} else {
-
-													list += "," + vars[1];
-													if (typ == 1) {
-														list = sign.getLine(2) + "," + vars[1];
-														typ = 3;
-													}
-													if (typ == 2) {
-														list = sign.getLine(2) + "," + vars[1];
-														typ = 4;
-													}
-													if (typ == 6) {
-														list = sign.getLine(2) + "," + vars[1];
-														typ = 8;
-													}
-													if (typ == 7) {
-														list = sign.getLine(2) + "," + vars[1];
-														typ = 9;
-													}
-													if (typ == 12) {
-														list = sign.getLine(2) + "," + vars[1];
-														typ = 14;
-													}
-													if (typ == 13) {
-														list = sign.getLine(2) + "," + vars[1];
-														typ = 15;
-													}
-													stringneu += cordX + ":" + cordY + ":" + cordZ + ":" + cordW.getName() + ":" + typ + ":" + list + System.getProperty("line.separator");
-													p.sendMessage(configHandler.getMessage(configHandler.amountadded, p.getName(), 0D));
+										if (configHandler.isMysql()) {
+											// MySQL
+											Integer x = signblock.getX();
+											Integer y = signblock.getY();
+											Integer z = signblock.getZ();
+											World w = signblock.getWorld();
+											boolean exist = configHandler.getDb().getBank(x, y, z, w.getName());
+											if(exist) {
+												String list = configHandler.getDb().getAmountsOfBank(x, y, z, w.getName());
+												Integer typ = configHandler.getDb().getTypeOfBank(x, y, z, w.getName());
+												list += "," + vars[1];
+												if (typ == 1) {
+													list = sign.getLine(2) + "," + vars[1];
+													typ = 3;
 												}
+												if (typ == 2) {
+													list = sign.getLine(2) + "," + vars[1];
+													typ = 4;
+												}
+												if (typ == 6) {
+													list = sign.getLine(2) + "," + vars[1];
+													typ = 8;
+												}
+												if (typ == 7) {
+													list = sign.getLine(2) + "," + vars[1];
+													typ = 9;
+												}
+												if (typ == 12) {
+													list = sign.getLine(2) + "," + vars[1];
+													typ = 14;
+												}
+												if (typ == 13) {
+													list = sign.getLine(2) + "," + vars[1];
+													typ = 15;
+												}
+												configHandler.getDb().setBank(x, y, z, w.getName(), typ, list);
+												p.sendMessage(configHandler.getMessage(configHandler.amountadded, p.getName(), 0D));
 											}
-											fr.close();
-											reader.close();
-											writer = new FileWriter(file);
-											writer.write(stringneu);
-											writer.flush();
-											writer.close();
-											return true;
-										} catch (IOException e) {
-											e.printStackTrace();
+										}
+										else {
+											// File
+											file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "banks.db");
+
+											try {
+												String stringneu = "";
+												FileReader fr = new FileReader(file);
+												BufferedReader reader = new BufferedReader(fr);
+												String st = "";
+												while ((st = reader.readLine()) != null) {
+
+													Integer cordX = new Integer(st.split(":")[0]);
+													Integer cordY = new Integer(st.split(":")[1]);
+													Integer cordZ = new Integer(st.split(":")[2]);
+													Integer typ = new Integer(st.split(":")[4]);
+													String list = st.split(":")[5];
+													Block block = p.getTargetBlock(null, 100);
+
+													World cordW = Bankcraft.server.getWorld(st.split(":")[3]);
+													if (!(cordX == block.getX() & cordY == block.getY() & cordZ == block.getZ() && cordW.equals(block.getWorld()))) {
+														stringneu += st + System.getProperty("line.separator");
+													} else {
+
+														list += "," + vars[1];
+														if (typ == 1) {
+															list = sign.getLine(2) + "," + vars[1];
+															typ = 3;
+														}
+														if (typ == 2) {
+															list = sign.getLine(2) + "," + vars[1];
+															typ = 4;
+														}
+														if (typ == 6) {
+															list = sign.getLine(2) + "," + vars[1];
+															typ = 8;
+														}
+														if (typ == 7) {
+															list = sign.getLine(2) + "," + vars[1];
+															typ = 9;
+														}
+														if (typ == 12) {
+															list = sign.getLine(2) + "," + vars[1];
+															typ = 14;
+														}
+														if (typ == 13) {
+															list = sign.getLine(2) + "," + vars[1];
+															typ = 15;
+														}
+														stringneu += cordX + ":" + cordY + ":" + cordZ + ":" + cordW.getName() + ":" + typ + ":" + list + System.getProperty("line.separator");
+														p.sendMessage(configHandler.getMessage(configHandler.amountadded, p.getName(), 0D));
+													}
+												}
+												fr.close();
+												reader.close();
+												writer = new FileWriter(file);
+												writer.write(stringneu);
+												writer.flush();
+												writer.close();
+												return true;
+											} catch (IOException e) {
+												e.printStackTrace();
+											}
 										}
 									}
 								}
