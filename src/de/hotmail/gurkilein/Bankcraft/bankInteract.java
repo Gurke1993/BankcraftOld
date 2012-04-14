@@ -403,7 +403,6 @@ public class bankInteract {
 				nachricht = configHandler.balancexp;
 				bankInteract.kontoneuxp(0, p.getName(), false);
 				Double test = 0D;
-				plugin.getLogger().info(test.toString());
 				p.sendMessage(configHandler.getMessage(nachricht, p.getName(), 0D));
 			}
 			if (typ == 10) {

@@ -110,7 +110,7 @@ public class BankcraftCommandListener implements CommandExecutor {
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
-									if (typsign == 1 | typsign == 2 | typsign == 6 | typsign == 7 | typsign == 12 | typsign == 13) {
+									if (typsign == 1 | typsign == 2 | typsign == 3 | typsign == 6 | typsign == 7 | typsign == 12 | typsign == 13) {
 										if (configHandler.isMysql()) {
 											// MySQL
 											Integer x = signblock.getX();
@@ -120,32 +120,35 @@ public class BankcraftCommandListener implements CommandExecutor {
 											boolean exist = configHandler.getDb().getBank(x, y, z, w.getName());
 											if(exist) {
 												String list = configHandler.getDb().getAmountsOfBank(x, y, z, w.getName());
-												Integer typ = configHandler.getDb().getTypeOfBank(x, y, z, w.getName());
-												list += "," + vars[1];
+												Integer typ = typsign;
 												if (typ == 1) {
 													list = sign.getLine(2) + "," + vars[1];
 													typ = 3;
 												}
-												if (typ == 2) {
+												else if (typ == 2) {
 													list = sign.getLine(2) + "," + vars[1];
 													typ = 4;
 												}
-												if (typ == 6) {
+												else if (typ == 3) {
+													list = list + "," + vars[1];
+												}
+												else if (typ == 6) {
 													list = sign.getLine(2) + "," + vars[1];
 													typ = 8;
 												}
-												if (typ == 7) {
+												else if (typ == 7) {
 													list = sign.getLine(2) + "," + vars[1];
 													typ = 9;
 												}
-												if (typ == 12) {
+												else if (typ == 12) {
 													list = sign.getLine(2) + "," + vars[1];
 													typ = 14;
 												}
-												if (typ == 13) {
+												else if (typ == 13) {
 													list = sign.getLine(2) + "," + vars[1];
 													typ = 15;
 												}
+												configHandler.getDb().deleteBank(x, y, z, w.getName());
 												configHandler.getDb().setBank(x, y, z, w.getName(), typ, list);
 												p.sendMessage(configHandler.getMessage(configHandler.amountadded, p.getName(), 0D));
 											}
@@ -218,38 +221,41 @@ public class BankcraftCommandListener implements CommandExecutor {
 							}
 						}
 
-						if (vars[0].equalsIgnoreCase(configHandler.comdeposit) && (Bankcraft.perms.has(p, "bankcraft.command.deposit") || Bankcraft.perms.has(p, "bankcraft.command"))) {
+						else if (vars[0].equalsIgnoreCase(configHandler.comdeposit) && (Bankcraft.perms.has(p, "bankcraft.command.deposit") || Bankcraft.perms.has(p, "bankcraft.command"))) {
 
 							bankInteract.use(p, vars[1], 1, null, "");
 							return true;
 						}
 
 
-						if (vars[0].equalsIgnoreCase(configHandler.comdebit) && (Bankcraft.perms.has(p, "bankcraft.command.debit") || Bankcraft.perms.has(p, "bankcraft.command"))) {
+						else if (vars[0].equalsIgnoreCase(configHandler.comdebit) && (Bankcraft.perms.has(p, "bankcraft.command.debit") || Bankcraft.perms.has(p, "bankcraft.command"))) {
 							bankInteract.use(p, vars[1], 2, null, "");
 							return true;
 						}
 
-						if (vars[0].equalsIgnoreCase(configHandler.comdepositxp) && (Bankcraft.perms.has(p, "bankcraft.command.depositxp") || Bankcraft.perms.has(p, "bankcraft.command"))) {
+						else if (vars[0].equalsIgnoreCase(configHandler.comdepositxp) && (Bankcraft.perms.has(p, "bankcraft.command.depositxp") || Bankcraft.perms.has(p, "bankcraft.command"))) {
 
 							bankInteract.use(p, vars[1], 6, null, "");
 							return true;
 						}
-						if (vars[0].equalsIgnoreCase(configHandler.comdebitxp) && (Bankcraft.perms.has(p, "bankcraft.command.debitxp") || Bankcraft.perms.has(p, "bankcraft.command"))) {
+						else if (vars[0].equalsIgnoreCase(configHandler.comdebitxp) && (Bankcraft.perms.has(p, "bankcraft.command.debitxp") || Bankcraft.perms.has(p, "bankcraft.command"))) {
 							bankInteract.use(p, vars[1], 7, null, "");
 							return true;
 						}
 
-						if (vars[0].equalsIgnoreCase(configHandler.comexchange) && (Bankcraft.perms.has(p, "bankcraft.command.exchange") || Bankcraft.perms.has(p, "bankcraft.command"))) {
+						else if (vars[0].equalsIgnoreCase(configHandler.comexchange) && (Bankcraft.perms.has(p, "bankcraft.command.exchange") || Bankcraft.perms.has(p, "bankcraft.command"))) {
 							bankInteract.use(p, vars[1], 12, null, "");
 							return true;
 						}
 
-						if (vars[0].equalsIgnoreCase(configHandler.comexchangexp) && (Bankcraft.perms.has(p, "bankcraft.command.exchangexp") || Bankcraft.perms.has(p, "bankcraft.command"))) {
+						else if (vars[0].equalsIgnoreCase(configHandler.comexchangexp) && (Bankcraft.perms.has(p, "bankcraft.command.exchangexp") || Bankcraft.perms.has(p, "bankcraft.command"))) {
 							bankInteract.use(p, vars[1], 13, null, "");
 							return true;
 						}
 
+						else {
+							p.sendMessage(ChatColor.RED + configHandler.prefix + "Wrong Syntax or missing permissions! Please see /bank help for more information!");
+						}
 
 					} else {
 						if (vars[0].equalsIgnoreCase(configHandler.combalance) && (Bankcraft.perms.has(p, "bankcraft.command.balance.other") || Bankcraft.perms.has(p, "bankcraft.command"))) {
@@ -258,7 +264,7 @@ public class BankcraftCommandListener implements CommandExecutor {
 						}
 
 
-						if (vars[0].equalsIgnoreCase(configHandler.combalancexp) && (Bankcraft.perms.has(p, "bankcraft.command.balancexp.other") || Bankcraft.perms.has(p, "bankcraft.command"))) {
+						else if (vars[0].equalsIgnoreCase(configHandler.combalancexp) && (Bankcraft.perms.has(p, "bankcraft.command.balancexp.other") || Bankcraft.perms.has(p, "bankcraft.command"))) {
 							bankInteract.use(p, "", 11, null, vars[1]);
 							return true;
 						}
@@ -294,7 +300,7 @@ public class BankcraftCommandListener implements CommandExecutor {
 						}
 
 
-						if (vars[0].equalsIgnoreCase(configHandler.comtransferxp) && (Bankcraft.perms.has(p, "bankcraft.command.transferxp") || Bankcraft.perms.has(p, "bankcraft.command"))) {
+						else if (vars[0].equalsIgnoreCase(configHandler.comtransferxp) && (Bankcraft.perms.has(p, "bankcraft.command.transferxp") || Bankcraft.perms.has(p, "bankcraft.command"))) {
 
 							if (configHandler.limitxp == -1 || configHandler.limitxp >= betrag + bankInteract.getBalanceXP(vars[1])) {
 								String differenzstring = bankInteract.kontoneuxp(-betrag.intValue(), p.getName(), false);
@@ -315,11 +321,13 @@ public class BankcraftCommandListener implements CommandExecutor {
 								p.sendMessage(configHandler.getMessage(configHandler.limitmsgxp, vars[1], betrag));
 							}
 						}
+						
+						else {
+							p.sendMessage(ChatColor.RED + configHandler.prefix + "Wrong Syntax or missing permissions! Please see /bank help for more information!");
+						}
 					}
 				}
 
-
-				p.sendMessage(ChatColor.RED + configHandler.prefix + "Wrong Syntax or missing permissions! Please see /bank help for more information!");
 				return true;
 			} else {
 
@@ -328,32 +336,44 @@ public class BankcraftCommandListener implements CommandExecutor {
 						sendAdminHelp(p);
 						return true;
 					}
-					if (vars.length == 1) {
+					else if (vars.length == 1) {
 
 						if (vars[0].equalsIgnoreCase(configHandler.comadmhelp)) {
 							sendAdminHelp(p);
 							return true;
 						}
 					}
-					if (vars.length == 2) {
+					else if (vars.length == 2) {
 						if (vars[0].equalsIgnoreCase(configHandler.comadmclear) && (Bankcraft.perms.has(p, "bankcraft.command.clear") || Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
 
 							if (bankInteract.getBalance(vars[1]) < 0) {
 								bankInteract.stopLoanPunishment(vars[1]);
 							}
-							file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "Accounts" + System.getProperty("file.separator") + vars[1] + ".db");
-							try {
-								if (!file.exists()) {
-									file.createNewFile();
+							if (configHandler.isMysql()) {
+								//MySQL
+								boolean exist = configHandler.getDb().getAccount(vars[1]);
+								if (!exist) {
+									configHandler.getDb().setAccount(vars[1], 0D);
 								}
-								writer = new FileWriter(file, false);
-								writer.write("0.00");
-								writer.flush();
-								writer.close();
-							} catch (Exception e) {
-								e.printStackTrace();
+								else {
+									configHandler.getDb().deposit("0.00", vars[1]);
+								}
 							}
-
+							else {
+								// File
+								file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "Accounts" + System.getProperty("file.separator") + vars[1] + ".db");
+								try {
+									if (!file.exists()) {
+										file.createNewFile();
+									}
+									writer = new FileWriter(file, false);
+									writer.write("0.00");
+									writer.flush();
+									writer.close();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
 							p.sendMessage(configHandler.color + configHandler.prefix + "Account cleared!");
 							return true;
 						}
@@ -361,72 +381,121 @@ public class BankcraftCommandListener implements CommandExecutor {
 							if (bankInteract.getBalanceXP(vars[1]) < 0) {
 								bankInteract.stopLoanPunishmentXP(vars[1]);
 							}
-							file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + vars[1] + ".db");
-							try {
-								if (!file.exists()) {
-									file.createNewFile();
+							if (configHandler.isMysql()) {
+								// MySQL
+								boolean exist = configHandler.getDb().getXpAccount(vars[1]);
+								if (!exist) {
+									configHandler.getDb().setXpAccount(vars[1], "0");
 								}
-								writer = new FileWriter(file, false);
-								writer.write("0.00");
-								writer.flush();
-								writer.close();
-							} catch (Exception e) {
-								e.printStackTrace();
+								else {
+									configHandler.getDb().depositXp("0", vars[1]);
+								}
 							}
-
-							p.sendMessage(configHandler.color + configHandler.prefix + "XP-Account cleared!");
-							return true;
-						}
-					}
-					if (vars.length == 3) {
-						if (isDouble(vars[2])) {
-							if (vars[0].equalsIgnoreCase(configHandler.comadmset) && (Bankcraft.perms.has(p, "bankcraft.command.set") || Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-								file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "Accounts" + System.getProperty("file.separator") + vars[1] + ".db");
+							else {
+								// File
+								file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + vars[1] + ".db");
 								try {
 									if (!file.exists()) {
 										file.createNewFile();
 									}
-									Double konto = bankInteract.getBalance(vars[1]);
 									writer = new FileWriter(file, false);
-									writer.write(vars[2]);
+									writer.write("0.00");
 									writer.flush();
 									writer.close();
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}
+							p.sendMessage(configHandler.color + configHandler.prefix + "XP-Account cleared!");
+							return true;
+						}
+					}
+					else if (vars.length == 3) {
+						if (isDouble(vars[2])) {
+							if (vars[0].equalsIgnoreCase(configHandler.comadmset) && (Bankcraft.perms.has(p, "bankcraft.command.set") || Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
+								if (configHandler.isMysql()) {
+									// MySQL
+									boolean exist = configHandler.getDb().getAccount(vars[1]);
+									if (!exist) {
+										configHandler.getDb().setAccount(vars[1], new Double(vars[2]));
+									}
+									else {
+										configHandler.getDb().deposit(vars[2], vars[1]);
+									}
+									Double konto = bankInteract.getBalance(vars[1]);
 									if (bankInteract.getBalance(vars[1]) >= 0 && konto < 0) {
 										bankInteract.stopLoanPunishment(vars[1]);
 									}
 									if (bankInteract.getBalance(vars[1]) < 0 && konto >= 0) {
 										bankInteract.startLoanPunishment(vars[1]);
 									}
-									p.sendMessage(configHandler.color + configHandler.prefix + "Account set!");
-									return true;
-								} catch (Exception e) {
-									e.printStackTrace();
 								}
+								else {
+									file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "Accounts" + System.getProperty("file.separator") + vars[1] + ".db");
+									try {
+										if (!file.exists()) {
+											file.createNewFile();
+										}
+										Double konto = bankInteract.getBalance(vars[1]);
+										writer = new FileWriter(file, false);
+										writer.write(vars[2]);
+										writer.flush();
+										writer.close();
+										if (bankInteract.getBalance(vars[1]) >= 0 && konto < 0) {
+											bankInteract.stopLoanPunishment(vars[1]);
+										}
+										if (bankInteract.getBalance(vars[1]) < 0 && konto >= 0) {
+											bankInteract.startLoanPunishment(vars[1]);
+										}
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+								p.sendMessage(configHandler.color + configHandler.prefix + "Account set!");
+								return true;
 							}
 
 							if (vars[0].equalsIgnoreCase(configHandler.comadmsetxp) && (Bankcraft.perms.has(p, "bankcraft.command.setxp") || Bankcraft.perms.has(p, "bankcraft.command.admin"))) {
-								file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + vars[1] + ".db");
-								try {
-									if (!file.exists()) {
-										file.createNewFile();
+								if (configHandler.isMysql()) {
+									// MySQL
+									boolean exist = configHandler.getDb().getXpAccount(vars[1]);
+									if (!exist) {
+										configHandler.getDb().setXpAccount(vars[1], vars[2]);
+									}
+									else {
+										configHandler.getDb().depositXp(vars[2], vars[1]);
 									}
 									Integer kontoxp = bankInteract.getBalanceXP(vars[1]);
-									writer = new FileWriter(file, false);
-									writer.write(vars[2]);
-									writer.flush();
-									writer.close();
 									if (bankInteract.getBalanceXP(vars[1]) >= 0 && kontoxp < 0) {
 										bankInteract.stopLoanPunishment(vars[1]);
 									}
 									if (bankInteract.getBalanceXP(vars[1]) < 0 && kontoxp >= 0) {
 										bankInteract.startLoanPunishment(vars[1]);
 									}
-
-									p.sendMessage(configHandler.color + configHandler.prefix + "XP-Account set!");
-									return true;
-								} catch (Exception e) {
-									e.printStackTrace();
 								}
+								else {
+									file = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + vars[1] + ".db");
+									try {
+										if (!file.exists()) {
+											file.createNewFile();
+										}
+										Integer kontoxp = bankInteract.getBalanceXP(vars[1]);
+										writer = new FileWriter(file, false);
+										writer.write(vars[2]);
+										writer.flush();
+										writer.close();
+										if (bankInteract.getBalanceXP(vars[1]) >= 0 && kontoxp < 0) {
+											bankInteract.stopLoanPunishment(vars[1]);
+										}
+										if (bankInteract.getBalanceXP(vars[1]) < 0 && kontoxp >= 0) {
+											bankInteract.startLoanPunishment(vars[1]);
+										}
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+								p.sendMessage(configHandler.color + configHandler.prefix + "XP-Account set!");
+								return true;
 							}
 
 
@@ -466,7 +535,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 							}
 						}
 					}
-					p.sendMessage(ChatColor.RED + configHandler.prefix + "Wrong Syntax or missing permissions! Please see /bank help for more information!");
+					else {
+						p.sendMessage(ChatColor.RED + configHandler.prefix + "Wrong Syntax or missing permissions! Please see /bank help for more information!");
+					}
 					return true;
 				}
 			}
