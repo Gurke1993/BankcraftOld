@@ -24,6 +24,7 @@ public class bankInteract {
 	private static Bankcraft plugin;
 	public static Map<Block, Integer> signPosition = new HashMap<Block, Integer>();
 
+	@SuppressWarnings("static-access")
 	public bankInteract(Bankcraft b1) {
 		this.plugin = b1;
 	}
@@ -402,7 +403,6 @@ public class bankInteract {
 			if (typ == 5) {
 				nachricht = configHandler.balancexp;
 				bankInteract.kontoneuxp(0, p.getName(), false);
-				Double test = 0D;
 				p.sendMessage(configHandler.getMessage(nachricht, p.getName(), 0D));
 			}
 			if (typ == 10) {
