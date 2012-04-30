@@ -288,6 +288,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 									if (bankInteract.getBalance(vars[1]) >= 0 && bankInteract.getBalance(vars[1]) - betrag < 0) {
 										bankInteract.stopLoanPunishment(vars[1]);
 									}
+									if (configHandler.log) {
+										Bankcraft.log.info("[Bankcraft] "+p.getName()+" transfered "+betrag+" money to "+vars[1]+"!");
+									}
 									p.sendMessage(configHandler.getMessage(configHandler.success3, p.getName(), betrag));
 
 								} else {
@@ -311,6 +314,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 									bankInteract.kontoneuxp(betrag.intValue(), vars[1], false);
 									if (bankInteract.getBalanceXP(vars[1]) >= 0 && bankInteract.getBalance(vars[1]) - betrag < 0) {
 										bankInteract.stopLoanPunishmentXP(vars[1]);
+									}
+									if (configHandler.log) {
+										Bankcraft.log.info("[Bankcraft] "+p.getName()+" transfered "+betrag+" Xp to "+vars[1]+"!");
 									}
 									p.sendMessage(configHandler.getMessage(configHandler.success3xp, p.getName(), betrag));
 								} else {
@@ -374,6 +380,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 									e.printStackTrace();
 								}
 							}
+							if (configHandler.log) {
+								Bankcraft.log.info("[Bankcraft] "+p.getName()+" cleared "+vars[1]+"'s money-account!");
+							}
 							p.sendMessage(configHandler.color + configHandler.prefix + "Account cleared!");
 							return true;
 						}
@@ -405,6 +414,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
+							}
+							if (configHandler.log) {
+								Bankcraft.log.info("[Bankcraft] "+p.getName()+" cleared "+vars[1]+"'s Xp-account!");
 							}
 							p.sendMessage(configHandler.color + configHandler.prefix + "XP-Account cleared!");
 							return true;
@@ -451,6 +463,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 										e.printStackTrace();
 									}
 								}
+								if (configHandler.log) {
+									Bankcraft.log.info("[Bankcraft] "+p.getName()+" set "+vars[1]+"'s money account to "+vars[2]+"!");
+								}
 								p.sendMessage(configHandler.color + configHandler.prefix + "Account set!");
 								return true;
 							}
@@ -494,6 +509,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 										e.printStackTrace();
 									}
 								}
+								if (configHandler.log) {
+									Bankcraft.log.info("[Bankcraft] "+p.getName()+" set "+vars[1]+"'s Xp-account to "+vars[2]+"!");
+								}
 								p.sendMessage(configHandler.color + configHandler.prefix + "XP-Account set!");
 								return true;
 							}
@@ -508,6 +526,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 									}
 									if (bankInteract.getBalance(vars[1]) < 0 && bankInteract.getBalance(vars[1]) + betrag >= 0) {
 										bankInteract.startLoanPunishment(vars[1]);
+									}
+									if (configHandler.log) {
+										Bankcraft.log.info("[Bankcraft] "+p.getName()+" granted "+vars[1]+" "+vars[2]+" money!");
 									}
 									p.sendMessage(configHandler.getMessage(configHandler.success1, vars[1], betrag));
 								} else {
@@ -526,6 +547,9 @@ public class BankcraftCommandListener implements CommandExecutor {
 									}
 									if (bankInteract.getBalanceXP(vars[1]) < 0 && bankInteract.getBalanceXP(vars[1]) + betrag >= 0) {
 										bankInteract.startLoanPunishment(vars[1]);
+									}
+									if (configHandler.log) {
+										Bankcraft.log.info("[Bankcraft] "+p.getName()+" granted "+vars[1]+" "+vars[2]+" Xp!");
 									}
 									p.sendMessage(configHandler.getMessage(configHandler.success1xp, vars[1], betrag));
 								} else {

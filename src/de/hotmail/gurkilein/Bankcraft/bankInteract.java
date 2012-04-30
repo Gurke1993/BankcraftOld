@@ -448,6 +448,9 @@ public class bankInteract {
 								bankInteract.stopLoanPunishment(p.getName());
 							}
 						}
+						if (configHandler.log) {
+							Bankcraft.log.info("[Bankcraft] "+p.getName()+" deposited "+betrag+" money!");
+						}
 						p.sendMessage(configHandler.getMessage(configHandler.success1, p.getName(), betrag));
 					} else {
 						p.sendMessage(configHandler.getMessage(configHandler.lowmoney1, p.getName(), betrag));
@@ -468,6 +471,9 @@ public class bankInteract {
 						if (bankInteract.getBalanceXP(p.getName()) >= 0 && bankInteract.getBalanceXP(p.getName()) - betrag < 0) {
 							bankInteract.stopLoanPunishmentXP(p.getName());
 						}
+						if (configHandler.log) {
+							Bankcraft.log.info("[Bankcraft] "+p.getName()+" deposited "+betrag+" Xp!");
+						}
 						p.sendMessage(configHandler.getMessage(configHandler.success1xp, p.getName(), betrag));
 					} else {
 						p.sendMessage(configHandler.getMessage(configHandler.lowmoney1xp, p.getName(), betrag));
@@ -487,6 +493,9 @@ public class bankInteract {
 					}
 					EconomyResponse r2 = Bankcraft.econ.depositPlayer(p.getName(), differenz);
 					if (r2.transactionSuccess()) {
+						if (configHandler.log) {
+							Bankcraft.log.info("[Bankcraft] "+p.getName()+" debited "+betrag+" money!");
+						}
 						p.sendMessage(configHandler.getMessage(configHandler.success2, p.getName(), betrag));
 					}
 				} else {
@@ -502,6 +511,9 @@ public class bankInteract {
 						bankInteract.startLoanPunishmentXP(p.getName());
 					}
 					p.giveExp(differenz);
+					if (configHandler.log) {
+						Bankcraft.log.info("[Bankcraft] "+p.getName()+" debited "+betrag+" Xp!");
+					}
 					p.sendMessage(configHandler.getMessage(configHandler.success2xp, p.getName(), betrag));
 				} else {
 					p.sendMessage(configHandler.getMessage(configHandler.lowmoney2xp, p.getName(), betrag));
@@ -520,6 +532,9 @@ public class bankInteract {
 						bankInteract.kontoneuxp(betragneu, p.getName(), false);
 						if (bankInteract.getBalanceXP(p.getName()) >= 0 && bankInteract.getBalanceXP(p.getName()) - betragneu < 0) {
 							bankInteract.stopLoanPunishmentXP(p.getName());
+						}
+						if (configHandler.log) {
+							Bankcraft.log.info("[Bankcraft] "+p.getName()+" exchanged "+betrag+" money!");
 						}
 						p.sendMessage(configHandler.getMessage(configHandler.success4, p.getName(), betrag));
 					} else {
@@ -544,6 +559,9 @@ public class bankInteract {
 						bankInteract.kontoneu(betragneu, p.getName(), false);
 						if (bankInteract.getBalance(p.getName()) >= 0 && bankInteract.getBalance(p.getName()) - betragneu < 0) {
 							bankInteract.stopLoanPunishment(p.getName());
+						}
+						if (configHandler.log) {
+							Bankcraft.log.info("[Bankcraft] "+p.getName()+" exchanged "+betrag+" Xp!");
 						}
 						p.sendMessage(configHandler.getMessage(configHandler.success4xp, p.getName(), betrag));
 					} else {

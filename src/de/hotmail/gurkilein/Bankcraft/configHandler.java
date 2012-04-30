@@ -16,7 +16,7 @@ public class configHandler {
 	public static Double exchangerate, interest, interestxp, limit, limitxp, maxloan, maxloanxp, loaninterest, loaninterestxp;
 	public static ChatColor bankcolor, color;
 	public static Integer timer, loandamage;
-	public static Boolean broadcast, broadcastxp, onlinemoney, onlinexp;
+	public static Boolean log, broadcast, broadcastxp, onlinemoney, onlinexp;
 	public static String exchangesign, exchangesignxp, success4, success4xp, comexchange, comexchangexp, balancexpother, balanceother, nowinloan, nowinloanxp, nolongerloanxp, nolongerloan, loangroup, loangroupxp, interestlimitmsg, interestlimitmsgxp, limitmsg, limitmsgxp, comhelp, combalance, combalancexp, comdeposit, comdebit, comdepositxp, comdebitxp, comtransfer, comtransferxp, comadmhelp, comadmset, comadmsetxp, comadmgrant, comadmgrantxp, comadmclear, comadmclearxp, amountadded, prefix, make, destroy, depositsign, debitsign, balancesign, depositsignxp, debitsignxp, balancesignxp, disallow, errorcreate, lowmoney1, lowmoney2, lowmoney3, success1, success2, balance, lowmoney1xp, lowmoney2xp, lowmoney3xp, success3, success3xp, success1xp, success2xp, balancexp, interestmsg, interestxpmsg;
 	private static final ChatColor[] colors = new ChatColor[]{ChatColor.AQUA, ChatColor.BLACK, ChatColor.BLUE, ChatColor.DARK_AQUA, ChatColor.DARK_BLUE, ChatColor.DARK_GRAY, ChatColor.DARK_GREEN, ChatColor.DARK_PURPLE, ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.GRAY, ChatColor.GREEN, ChatColor.LIGHT_PURPLE, ChatColor.RED, ChatColor.WHITE, ChatColor.YELLOW};
 	public static String[][] interestGroups;
@@ -137,6 +137,7 @@ public class configHandler {
 		if (maxloanxp < 0) {
 			maxloanxp = 0D;
 		}
+		log = this.plugin.getConfig().getBoolean("general.log");
 		limit = this.plugin.getConfig().getDouble("general.limit");
 		limitxp = this.plugin.getConfig().getDouble("general.limitxp");
 		exchangerate = this.plugin.getConfig().getDouble("general.exchangerate");
@@ -254,7 +255,9 @@ public class configHandler {
 			config.options().header("Default config for BankCraft \r\n - Types of database : file or mysql \r\n");
 			config.options().copyHeader(true);
 			//
-
+			if (!config.contains("general.log")) {
+				config.set("general.log", false);
+			}
 			if (!config.contains("general.interest")) {
 				config.set("general.interest", 0.005);
 			}
