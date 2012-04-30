@@ -4,8 +4,6 @@ import de.hotmail.gurkilein.Bankcraft.Bankcraft;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -16,7 +14,6 @@ public abstract class BcDatabase {
 	private Bankcraft plugin;
 	private String prefix;
 	private BcConnectionPool pool;
-	public String database;
 	
 	public BcDatabase(Bankcraft plugin, String driver, String url, String user, String password, String prefix) {
 		this.plugin = plugin;
@@ -61,7 +58,11 @@ public abstract class BcDatabase {
 			BcConnection conn = getConnection();
 			PreparedStatement prest = conn.prepareStatement(sql);
 			ResultSet res = prest.executeQuery();
+			String i = "0";
 			while (res.next()) {
+				i = res.getString("amount");
+			}
+			if (!"0".equals(i)) {
 				exist = true;
 			}
 			prest.close();
@@ -80,7 +81,11 @@ public abstract class BcDatabase {
 			BcConnection conn = getConnection();
 			PreparedStatement prest = conn.prepareStatement(sql);
 			ResultSet res = prest.executeQuery();
+			String i = "0";
 			while (res.next()) {
+				i = res.getString("amount");
+			}
+			if (!"0".equals(i)) {
 				exist = true;
 			}
 			prest.close();
@@ -147,48 +152,6 @@ public abstract class BcDatabase {
 		}
 	}
 	
-	public Object[] getAccounts() {
-		String sql = "SELECT * FROM `"  + prefix + "accounts` ;";
-		List<String> load = new ArrayList<>();
-		try {
-			BcConnection conn = getConnection();
-			PreparedStatement prest = conn.prepareStatement(sql);
-			ResultSet res = prest.executeQuery();
-			while (res.next()) {
-				load.add(res.getString("playername"));
-				Bankcraft.log.info(res.getString("playername"));
-			}
-			prest.close();
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			plugin.disablePlugin();
-		}
-		Object[] accounts = load.toArray();
-		return accounts;
-	}
-	
-	public Object[] getXPAccounts() {
-		String sql = "SELECT * FROM `"  + prefix + "xp_accounts` ;";
-		List<String> load = new ArrayList<>();
-		try {
-			BcConnection conn = getConnection();
-			PreparedStatement prest = conn.prepareStatement(sql);
-			ResultSet res = prest.executeQuery();
-			while (res.next()) {
-				load.add(res.getString("playername"));
-				Bankcraft.log.info(res.getString("playername"));
-			}
-			prest.close();
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			plugin.disablePlugin();
-		}
-		Object[] accounts = load.toArray();
-		return accounts;
-	}
-	
 	public String getBalance(String player) {
 		String sql = "SELECT * FROM `"  + prefix + "accounts` WHERE `playername`=\"" + player + "\";";
 		String amount = "";
@@ -204,6 +167,10 @@ public abstract class BcDatabase {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			plugin.disablePlugin();
+		}
+		if (amount.equals("")) {
+			amount = "0";
+			setAccount(player, 0D);
 		}
 		return amount;
 	}
@@ -223,6 +190,10 @@ public abstract class BcDatabase {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			plugin.disablePlugin();
+		}
+		if (amount.equals("")) {
+			amount = "0";
+			setAccount(player, 0D);
 		}
 		return amount;
 	}

@@ -24,9 +24,8 @@ public class bankInteract {
 	private static Bankcraft plugin;
 	public static Map<Block, Integer> signPosition = new HashMap<Block, Integer>();
 
-	@SuppressWarnings("static-access")
 	public bankInteract(Bankcraft b1) {
-		this.plugin = b1;
+		plugin = b1;
 	}
 
 	public static Boolean stopLoanPunishment(String pstring) {
@@ -165,8 +164,15 @@ public class bankInteract {
 
 		Integer balancexp = null;
 		if (configHandler.isMysql()) {
-			String st = configHandler.getDb().getXpBalance(pstring);
-			balancexp = new Integer(st);
+			// get if player account is in database
+			boolean exist = configHandler.getDb().getXpAccount(pstring);
+			if(!exist){
+				configHandler.getDb().setXpAccount(pstring, "0");
+			}
+			else {
+				String st = configHandler.getDb().getXpBalance(pstring);
+				balancexp = new Integer(st);
+			}
 		}
 		else {
 			File ft = new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db");

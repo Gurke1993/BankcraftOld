@@ -39,7 +39,6 @@ public class BankcraftBlockListener implements Listener {
 					file.mkdirs();
 				}
 				file2 = new File(file + System.getProperty("file.separator") + "banks.db");
-				file2.createNewFile();
 				writer = new FileWriter(file2, true);
 
 				// Text wird in den Stream geschrieben

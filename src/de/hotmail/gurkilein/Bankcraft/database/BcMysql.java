@@ -24,11 +24,9 @@ public class BcMysql extends BcDatabase{
 			BcConnection conn = getConnection();
 			if(conn != null) {
 				Statement st = conn.createStatement();
-			//	String database = "CREATE DATABASE IF NOT EXISTS " + configHandler.database.get + ";";
 				String tableBanks = "CREATE TABLE IF NOT EXISTS `" + getPrefix() + "banks` (id int(10) AUTO_INCREMENT, x int(10) NOT NULL, y int(10) NOT NULL, z int(10) NOT NULL, world varchar(100) NOT NULL, type int(10) NOT NULL, amounts varchar(250) NOT NULL, PRIMARY KEY(id));";
 				String tableAccounts = "CREATE TABLE IF NOT EXISTS `" + getPrefix() + "accounts` (id int(10) AUTO_INCREMENT, playername varchar(50) NOT NULL, amount varchar(50) NOT NULL, PRIMARY KEY(id));";
 				String tableXpAccounts = "CREATE TABLE IF NOT EXISTS `" + getPrefix() + "xp_accounts` (id int(10) AUTO_INCREMENT, playername varchar(50) NOT NULL, amount varchar(50) NOT NULL, PRIMARY KEY(id));";
-			//	st.executeUpdate(database);
 				st.executeUpdate(tableBanks);
 				st.executeUpdate(tableAccounts);
 				st.executeUpdate(tableXpAccounts);

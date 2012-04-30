@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 public class configHandler {
 
@@ -20,7 +21,7 @@ public class configHandler {
 	private static final ChatColor[] colors = new ChatColor[]{ChatColor.AQUA, ChatColor.BLACK, ChatColor.BLUE, ChatColor.DARK_AQUA, ChatColor.DARK_BLUE, ChatColor.DARK_GRAY, ChatColor.DARK_GREEN, ChatColor.DARK_PURPLE, ChatColor.DARK_RED, ChatColor.GOLD, ChatColor.GRAY, ChatColor.GREEN, ChatColor.LIGHT_PURPLE, ChatColor.RED, ChatColor.WHITE, ChatColor.YELLOW};
 	public static String[][] interestGroups;
 	private Bankcraft plugin;
-	public static BcMysql database;
+	private static BcMysql database;
 	private static boolean mysql = false;
 
 	public configHandler(Bankcraft b1) {
@@ -34,6 +35,16 @@ public class configHandler {
 	public static BcMysql getDb() {
 		return database;
 	}
+	
+	public static boolean isPlayer(String pstring) {
+		try {
+			Player p = Bankcraft.server.getPlayer(pstring);
+			p.getLevel();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
 	public static String getMessage(String input, String pstring, Double amount) {
 		String output;
@@ -43,7 +54,7 @@ public class configHandler {
 		output = output.replace("%maxloan", maxloan + "");
 		output = output.replace("%limitxp", limitxp + "");
 		output = output.replace("%limit", limit + "");
-		if (!pstring.equals("")) {
+		if (isPlayer(pstring)) {
 			output = output.replace("%player", pstring);
 			if (isMysql()){
 				output = output.replace("%balancexp", bankInteract.getBalanceXP(pstring) + "");
@@ -51,10 +62,10 @@ public class configHandler {
 				output = output.replace("%pocketxp", bankInteract.getTotalXp(Bankcraft.server.getPlayer(pstring)) + "");
 			}
 			else {
-				if (new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db").exists()) {
+				if ((new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "XPAccounts" + System.getProperty("file.separator") + pstring + ".db").exists() && !isMysql()) || (isMysql() && getDb().getXpAccount(pstring))) {
 					output = output.replaceAll("%balancexp", bankInteract.getBalanceXP(pstring) + "");
 				}
-				if (new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "Accounts" + System.getProperty("file.separator") + pstring + ".db").exists()) {
+				if ((new File("plugins" + System.getProperty("file.separator") + "Bankcraft" + System.getProperty("file.separator") + "Accounts" + System.getProperty("file.separator") + pstring + ".db").exists() && !isMysql()) || (isMysql() && getDb().getAccount(pstring))) {
 					output = output.replace("%balance", bankInteract.getBalance(pstring) + "");
 				}
 			}
@@ -404,13 +415,13 @@ public class configHandler {
 				config.set("language.amountadded", "Your value was successfully added to the sign!");
 			}
 			if (!config.contains("language.nolongerloan")) {
-				config.set("language.nolongerloan", "You payed your depts!");
+				config.set("language.nolongerloan", "You paid your debts!");
 			}
 			if (!config.contains("language.nowinloan")) {
 				config.set("language.nowinloan", "You now have debts!");
 			}
 			if (!config.contains("language.nolongerloanxp")) {
-				config.set("language.nolongerloanxp", "You payed your XP-depts!");
+				config.set("language.nolongerloanxp", "You payed your XP-debts!");
 			}
 			if (!config.contains("language.nowinloanxp")) {
 				config.set("language.nowinloanxp", "You now have XP-debts!");
